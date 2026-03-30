@@ -42,7 +42,15 @@ export function ServiceRow({ s, onEdit, onRenew, onEnd, onReactivate, onDelete }
 // ─────────────────────────────────────────────────────
 export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, onDeactivate, onActivate, onAddService, onEditSvc, onRenewSvc, onEndSvc, onReactivate, onDeleteSvc, allAccounts }) {
   const [expanded, setExpanded] = useState({});
+  const [visited, setVisited] = useState({});
   const toggle = id => setExpanded(p => ({ ...p, [id]: !p[id] }));
+
+  const handleVisit = (id) => {
+    setVisited(p => ({ ...p, [id]: new Date().toLocaleString("ko-KR") }));
+  };
+  const handleAction = (id) => {
+    setVisited(p => { const n = { ...p }; delete n[id]; return n; });
+  };
 
   const getLinkedLabel = (linkedId) => {
     if (!linkedId) return "—";
@@ -53,10 +61,10 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
 
   return (
     <div style={{ overflowX: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 1400 }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 1200 }}>
         <thead>
           <tr style={{ background: "#0b0e1a", borderBottom: `2px solid ${C.border}` }}>
-            {["", "소유자", "그룹", "유형", "태그", "사이트명", "아이디", "패스워드", "접속", "서비스", "액션"].map(h => (
+            {["", "그룹", "유형", "태그", "사이트명", "아이디", "패스워드", "접속", "최근접속", "서비스", "액션"].map(h => (
               <th key={h} style={{ padding: "10px 13px", textAlign: "left", color: C.muted, fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{h}</th>
             ))}
           </tr>
@@ -65,22 +73,22 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
           {accounts.map((a, i) => {
             const svcs = svcByAcc(a.id);
             const isOpen = expanded[a.id];
-            const rowBg = i % 2 === 0 ? C.bg : "#0c0f1c";
+            const isVisited = !!visited[a.id];
+            const rowBg = isVisited ? "#1a1510" : (i % 2 === 0 ? C.bg : "#0c0f1c");
             const activeCount = svcs.filter(s => s.status === "active").length;
             const isInactive = a.status === "inactive";
             return (
               <>
-                <tr key={a.id} style={{ background: rowBg, borderBottom: `1px solid ${C.border}`, cursor: "pointer", opacity: isInactive ? 0.5 : 1 }}
+                <tr key={a.id} style={{ background: rowBg, borderBottom: `1px solid ${isVisited ? C.warn + "30" : C.border}`, cursor: "pointer", opacity: isInactive ? 0.5 : 1 }}
                   onClick={() => toggle(a.id)}
-                  onMouseEnter={e => e.currentTarget.style.background = "#141c2e"}
-                  onMouseLeave={e => e.currentTarget.style.background = rowBg}>
+                  onMouseEnter={e => { if (!isVisited) e.currentTarget.style.background = "#141c2e"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = rowBg; }}>
                   <td style={tdSt}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ color: C.muted, fontSize: 16 }}>{isOpen ? "▾" : "▸"}</span>
                       {isInactive && <Tag text="비활성" color={C.muted} />}
                     </div>
                   </td>
-                  <td style={tdSt}><span style={{ fontWeight: 700, color: isInactive ? C.muted : "#fff" }}>{a.owner || "—"}</span></td>
                   <td style={tdSt}>{a.group ? <Tag text={a.group} color={groupColors[a.group] || C.muted} /> : "—"}</td>
                   <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.types || []).length > 0 ? (a.types || []).map(t => <Tag key={t} text={t} color={C.blue} />) : "—"}</div></td>
                   <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.tags || []).length > 0 ? (a.tags || []).map(t => <Tag key={t} text={t} color={C.green} />) : "—"}</div></td>
@@ -99,10 +107,14 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   <td style={tdSt} onClick={e => e.stopPropagation()}>
                     {a.url ? (
                       <a href={a.url.startsWith("http") ? a.url : `https://${a.url}`} target="_blank" rel="noreferrer"
+                        onClick={() => handleVisit(a.id)}
                         style={{ background: `linear-gradient(135deg,${C.brand},#ff4d4d)`, color: "#fff", borderRadius: 6, padding: "4px 12px", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
                         접속하기
                       </a>
                     ) : <span style={{ color: C.muted }}>—</span>}
+                  </td>
+                  <td style={tdSt}>
+                    <span style={{ fontSize: 11, color: visited[a.id] ? C.warn : C.muted }}>{visited[a.id] || "—"}</span>
                   </td>
                   <td style={tdSt}>
                     {activeCount > 0 ? (
@@ -113,13 +125,8 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   </td>
                   <td style={{ ...tdSt, whiteSpace: "nowrap" }} onClick={e => e.stopPropagation()}>
                     <div style={{ display: "flex", gap: 4 }}>
-                      {!isInactive && <Btn small accent onClick={() => onAddService(a.id)}>+ 서비스</Btn>}
-                      <Btn small blue onClick={() => onEdit(a)}>수정</Btn>
-                      {isInactive
-                        ? <Btn small green onClick={() => onActivate(a.id)}>활성화</Btn>
-                        : <Btn small ghost onClick={() => onDeactivate(a.id)}>비활성</Btn>
-                      }
-                      <Btn small danger onClick={() => onDelete(a)}>삭제</Btn>
+                      <Btn small blue onClick={() => { handleAction(a.id); onEdit(a); }}>수정</Btn>
+                      <Btn small danger onClick={() => { handleAction(a.id); onDelete(a); }}>삭제</Btn>
                     </div>
                   </td>
                 </tr>
@@ -129,6 +136,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                       <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}` }}>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: "12px 20px", marginBottom: 14 }}>
                           {[
+                            ["계정소유자", a.owner],
                             ["로그인방법", getLoginType(a)],
                             ["연동계정", getLinkedLabel(a.linkedAccount)],
                             ["URL", a.url],

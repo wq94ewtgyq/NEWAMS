@@ -465,7 +465,6 @@ export default function App() {
         {tab === "accounts" ? (
           <AccountsTab accounts={filteredAccounts} services={services} allAccounts={accounts} svcByAcc={svcByAcc} onEdit={openEditAcc}
             onDelete={r => setDelConfirm({ type: "account", id: r.id, label: `${r.owner}의 ${r.username}` })}
-            onDeactivate={deactivateAcc} onActivate={activateAcc}
             onAddService={openAddSvc} onEditSvc={openEditSvc} onRenewSvc={openRenewSvc}
             onEndSvc={s => setEndConfirm(s)} onReactivate={reactivate}
             onDeleteSvc={s => setDelConfirm({ type: "service", id: s.id, label: s.name })} />
