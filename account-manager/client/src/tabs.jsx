@@ -126,7 +126,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                       {isInactive && <Tag text="비활성" color={C.sub} />}
                     </div>
                   </td>
-                  <td style={tdSt}>{a.group ? <span style={{ display: "inline-flex", alignItems: "center", height: 22, padding: "0 8px", borderRadius: 999, background: grpColor + "18", border: `1px solid ${grpColor}30`, color: grpColor, fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" }}>{a.group}</span> : <span style={{ color: C.sub }}>—</span>}</td>
+                  <td style={tdSt}>{a.group ? <span style={{ color: grpColor, fontWeight: 700, fontSize: 12 }}>{a.group}</span> : <span style={{ color: C.sub }}>—</span>}</td>
                   <td style={{ ...tdSt, overflow: "hidden" }}>
                     <div>
                       <span style={{ fontWeight: 800, color: "#ffffff", fontSize: 14, letterSpacing: -0.2 }}>{a.siteName || "—"}</span>
@@ -136,10 +136,10 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                       </div>
                     </div>
                   </td>
-                  <td style={{ ...tdSt, overflow: "hidden" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, opacity: 0.7 }}>
-                      <span style={{ fontFamily: "monospace", color: C.muted, fontSize: 12, flex: "1 1 auto", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.username || "—"}</span>
-                      {a.username && <span style={{ flex: "0 0 auto" }}><CopyBtn text={a.username} label="복사" /></span>}
+                  <td style={tdSt}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, opacity: 0.7 }}>
+                      <span style={{ fontFamily: "monospace", color: C.muted, fontSize: 12 }}>{a.username || "—"}</span>
+                      {a.username && <CopyBtn text={a.username} label="복사" />}
                     </div>
                   </td>
                   <td style={tdSt} onClick={e => e.stopPropagation()}>
