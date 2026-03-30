@@ -264,6 +264,8 @@ export default function App() {
         let addCount = 0, updateCount = 0;
         const parseTags = str => String(str || "").split(",").map(s => s.replace(/\s/g, "")).filter(Boolean);
 
+        const newOwners = new Set(owners);
+        const newGroups = new Set(groups);
         const newPlatforms = new Set(platformOptions);
         const newTypes = new Set(typeOptions);
         const newTags = new Set(tagOptions);
@@ -289,9 +291,14 @@ export default function App() {
           rowTypes.forEach(v => newTypes.add(v));
           rowTags.forEach(v => newTags.add(v));
 
+          const rowOwner = String(row["계정소유자"] || "").replace(/\s/g, "");
+          const rowGroup = String(row["그룹"] || "").replace(/\s/g, "");
+          if (rowOwner) newOwners.add(rowOwner);
+          if (rowGroup) newGroups.add(rowGroup);
+
           const accData = {
-            owner: String(row["계정소유자"] || ""),
-            group: String(row["그룹"] || ""),
+            owner: rowOwner,
+            group: rowGroup,
             platforms: rowPlatforms,
             types: rowTypes,
             tags: rowTags,
@@ -315,15 +322,21 @@ export default function App() {
           }
         }
 
+        const updatedOwners = [...newOwners];
+        const updatedGroups = [...newGroups];
         const updatedPlatforms = [...newPlatforms];
         const updatedTypes = [...newTypes];
         const updatedTags = [...newTags];
 
         setAccounts(newAccounts);
+        setOwners(updatedOwners);
+        setGroups(updatedGroups);
         setPlatformOptions(updatedPlatforms);
         setTypeOptions(updatedTypes);
         setTagOptions(updatedTags);
         await persist(newAccounts, services, {
+          owners: updatedOwners,
+          groups: updatedGroups,
           platformOptions: updatedPlatforms,
           typeOptions: updatedTypes,
           tagOptions: updatedTags,
