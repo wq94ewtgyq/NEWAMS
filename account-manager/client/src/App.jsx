@@ -503,7 +503,7 @@ export default function App() {
               비활성 포함 {inactiveCount > 0 && `(${inactiveCount})`}
             </button>
             {accounts.some(a => a.visitHighlight) && (
-              <button onClick={resetVisits} style={{ background: "none", border: "none", color: C.sub, cursor: "pointer", fontSize: 11, padding: "3px 8px", textDecoration: "underline" }}>음영초기화</button>
+              <button onClick={resetVisits} style={{ background: "#172554", border: `1px solid ${C.blue}40`, borderRadius: 4, color: C.blue, cursor: "pointer", fontSize: 11, fontWeight: 600, padding: "3px 10px", whiteSpace: "nowrap", transition: "all 0.15s" }}>음영초기화</button>
             )}
             <span style={{ fontSize: 11, color: C.sub, marginLeft: 8 }}>{tab === "accounts" ? `${filteredAccounts.length}개` : `${filteredServices.length}개`}</span>
           </div>
