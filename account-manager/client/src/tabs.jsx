@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C, calcExpiry, daysLeft, fmtDate, fmtCost, tdSt, groupColors } from "./constants.js";
+import { C, calcExpiry, daysLeft, fmtDate, fmtCost, tdSt, groupColors, getLoginType } from "./constants.js";
 import { Tag, PwCell, CopyBtn, Btn } from "./components.jsx";
 
 // ─────────────────────────────────────────────────────
@@ -122,8 +122,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                       <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}` }}>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: "12px 20px", marginBottom: 14 }}>
                           {[
-                            ["접속구분", a.accessType],
-                            ["로그인방법", a.loginMethod],
+                            ["로그인방법", getLoginType(a)],
                             ["연동계정", getLinkedLabel(a.linkedAccount)],
                             ["URL", a.url],
                           ].map(([label, val]) => (

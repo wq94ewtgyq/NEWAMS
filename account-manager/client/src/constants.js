@@ -76,6 +76,12 @@ export const groupColors = { "메인": "#a78bfa", "업무유틸": "#4d8cff", "�
 // ─────────────────────────────────────────────────────
 // 인증방법 옵션
 // ─────────────────────────────────────────────────────
+export function getLoginType(account) {
+  if (account.linkedAccount) return "간편로그인";
+  if (account.username && account.password) return "일반로그인";
+  return "—";
+}
+
 export const AUTH_METHODS = ["없음", "SMS문자", "카카오톡", "휴대폰OTP", "이메일", "공인인증서"];
 
 export const AUTH_FIELDS = {
@@ -91,8 +97,8 @@ export const AUTH_FIELDS = {
 // 폼 초기값
 // ─────────────────────────────────────────────────────
 export const emptyAccount = {
-  owner: "", group: "", platforms: [], types: [], tags: [], accessType: "사이트",
-  siteName: "", url: "", loginMethod: "일반", linkedAccount: "",
+  owner: "", group: "", platforms: [], types: [], tags: [],
+  siteName: "", url: "", linkedAccount: "",
   username: "", password: "",
   authInfos: [{ method: "없음", contact: "" }],
   note: "",

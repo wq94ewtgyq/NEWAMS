@@ -486,8 +486,6 @@ export function AccountForm({ form, setForm, owners, groups, platformOptions, ty
           <FieldRow label="그룹">
             <SearchableDropdown value={form.group} onChange={f("group")} options={groups} onManage={onManageGroups} placeholder="그룹 검색..." />
           </FieldRow>
-          <FieldRow label="접속구분"><Sel value={form.accessType} onChange={f("accessType")} options={["사이트", "프로그램", "앱"]} /></FieldRow>
-          <FieldRow label="로그인방법"><Sel value={form.loginMethod} onChange={f("loginMethod")} options={["일반", "간편로그인", "SSO"]} /></FieldRow>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px 16px", marginTop: 10 }}>
           <FieldRow label="플랫폼">

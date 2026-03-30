@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import * as XLSX from "xlsx";
-import { C, inputSt, groupColors, loadData, saveAllData, calcExpiry, daysLeft, uid, emptyAccount, emptyService } from "./constants.js";
+import { C, inputSt, groupColors, loadData, saveAllData, calcExpiry, daysLeft, uid, emptyAccount, emptyService, getLoginType } from "./constants.js";
 import { Btn, Modal, ModalHeader, ModalFooter, FilterSel, ButtonFilter, Toast, Spinner, AccountForm, ServiceForm, ManageListModal } from "./components.jsx";
 import { AccountsTab, ServicesTab } from "./tabs.jsx";
 
@@ -251,10 +251,9 @@ export default function App() {
         "플랫폼": (a.platforms || []).join(","),
         "유형": (a.types || []).join(","),
         "태그": (a.tags || []).join(","),
-        "접속구분": a.accessType,
         "사이트명": a.siteName || "",
         "URL": a.url,
-        "로그인방법": a.loginMethod,
+        "로그인방법": getLoginType(a),
         "연동계정": linkedStr,
         "아이디": a.username,
         "패스워드": a.password,
@@ -332,10 +331,8 @@ export default function App() {
             platforms: rowPlatforms,
             types: rowTypes,
             tags: rowTags,
-            accessType: String(row["접속구분"] || "사이트"),
             siteName: String(row["사이트명"] || ""),
             url: url,
-            loginMethod: String(row["로그인방법"] || "일반"),
             linkedAccount: "",
             username: username,
             password: String(row["패스워드"] || ""),
