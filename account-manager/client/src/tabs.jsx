@@ -44,6 +44,7 @@ const thSt = { padding: "10px 14px", textAlign: "left", color: C.muted, fontWeig
 
 export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, onDeactivate, onActivate, onVisit, onResetVisits, onAddService, onEditSvc, onRenewSvc, onEndSvc, onReactivate, onDeleteSvc, allAccounts, sortKey, sortDir, onSort }) {
   const [expanded, setExpanded] = useState({});
+  const [hovered, setHovered] = useState(null);
   const toggle = id => setExpanded(p => ({ ...p, [id]: !p[id] }));
 
   const fmtVisit = (iso) => {
@@ -77,13 +78,11 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
 
   return (
     <div>
-      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontSize: 13, minWidth: 1200 }}>
+      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontSize: 13, minWidth: 1000 }}>
         <thead>
           <tr>
             <th style={thSt}></th>
             <SortTh k="group">그룹</SortTh>
-            <th style={thSt}>유형</th>
-            <th style={thSt}>태그</th>
             <SortTh k="siteName">사이트명</SortTh>
             <th style={thSt}>아이디</th>
             <th style={thSt}>패스워드</th>
@@ -106,8 +105,8 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
               <>
                 <tr key={a.id} style={{ background: rowBg, borderBottom: `1px solid ${isVisited ? C.blue + "30" : C.border}`, cursor: "pointer", opacity: isInactive ? 0.45 : 1, borderLeft: `3px solid ${grpColor}40` }}
                   onClick={() => toggle(a.id)}
-                  onMouseEnter={e => e.currentTarget.style.background = C.rowHover}
-                  onMouseLeave={e => e.currentTarget.style.background = rowBg}>
+                  onMouseEnter={e => { e.currentTarget.style.background = C.rowHover; setHovered(a.id); }}
+                  onMouseLeave={e => { e.currentTarget.style.background = rowBg; setHovered(null); }}>
                   <td style={tdSt}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ color: C.sub, fontSize: 14, transition: "transform 0.15s", transform: isOpen ? "rotate(90deg)" : "none" }}>▸</span>
@@ -115,10 +114,16 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                     </div>
                   </td>
                   <td style={tdSt}>{a.group ? <Tag text={a.group} color={grpColor} /> : <span style={{ color: C.sub }}>—</span>}</td>
-                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap", opacity: 0.7 }}>{(a.types || []).length > 0 ? (a.types || []).map(t => <span key={t} style={{ color: C.muted, fontSize: 10, background: C.border + "50", borderRadius: 3, padding: "1px 5px" }}>{t}</span>) : <span style={{ color: C.sub }}>—</span>}</div></td>
-                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap", opacity: 0.5 }}>{(a.tags || []).length > 0 ? (a.tags || []).map(t => <span key={t} style={{ color: C.sub, fontSize: 10, background: C.border + "30", borderRadius: 3, padding: "1px 5px" }}>{t}</span>) : <span style={{ color: C.sub }}>—</span>}</div></td>
                   <td style={tdSt}>
-                    <span style={{ fontWeight: 800, color: "#ffffff", fontSize: 14, letterSpacing: -0.2 }}>{a.siteName || "—"}</span>
+                    <div>
+                      <span style={{ fontWeight: 800, color: "#ffffff", fontSize: 14, letterSpacing: -0.2 }}>{a.siteName || "—"}</span>
+                      {hovered === a.id && ((a.types || []).length > 0 || (a.tags || []).length > 0) && (
+                        <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4, animation: "fadeIn 0.15s ease" }}>
+                          {(a.types || []).map(t => <span key={"t_"+t} style={{ color: C.muted, fontSize: 10, background: C.border + "50", borderRadius: 3, padding: "1px 5px" }}>{t}</span>)}
+                          {(a.tags || []).map(t => <span key={"g_"+t} style={{ color: C.sub, fontSize: 10, background: C.border + "30", borderRadius: 3, padding: "1px 5px" }}>{t}</span>)}
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td style={tdSt}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, opacity: 0.7 }}>
@@ -161,7 +166,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                 </tr>
                 {isOpen && (
                   <tr key={a.id + "_detail"} style={{ background: C.rowEven }}>
-                    <td colSpan={11} style={{ padding: 0, borderLeft: `3px solid ${grpColor}40` }}>
+                    <td colSpan={9} style={{ padding: 0, borderLeft: `3px solid ${grpColor}40` }}>
                       <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}` }}>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: "12px 20px", marginBottom: 14 }}>
                           {[
@@ -211,7 +216,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
             );
           })}
           {accounts.length === 0 && (
-            <tr><td colSpan={11} style={{ textAlign: "center", padding: 60, color: C.sub }}>계정이 없습니다.</td></tr>
+            <tr><td colSpan={9} style={{ textAlign: "center", padding: 60, color: C.sub }}>계정이 없습니다.</td></tr>
           )}
         </tbody>
       </table>
