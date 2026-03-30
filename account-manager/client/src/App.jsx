@@ -227,9 +227,9 @@ export default function App() {
       return {
         "계정소유자": a.owner,
         "그룹": a.group,
-        "플랫폼": (a.platforms || []).join(", "),
-        "유형": (a.types || []).join(", "),
-        "태그": (a.tags || []).join(", "),
+        "플랫폼": (a.platforms || []).join(","),
+        "유형": (a.types || []).join(","),
+        "태그": (a.tags || []).join(","),
         "접속구분": a.accessType,
         "사이트명": a.siteName || "",
         "URL": a.url,
@@ -262,7 +262,11 @@ export default function App() {
 
         const newAccounts = [...accounts];
         let addCount = 0, updateCount = 0;
-        const parseTags = str => String(str || "").split(",").map(s => s.trim()).filter(Boolean);
+        const parseTags = str => String(str || "").split(",").map(s => s.replace(/\s/g, "")).filter(Boolean);
+
+        const newPlatforms = new Set(platformOptions);
+        const newTypes = new Set(typeOptions);
+        const newTags = new Set(tagOptions);
 
         for (const row of rows) {
           const username = String(row["아이디"] || "").trim();
@@ -276,12 +280,21 @@ export default function App() {
             const [method, contact] = s.split(":");
             return { method: method || "없음", contact: contact || "" };
           }) : [{ method: "없음", contact: "" }];
+
+          const rowPlatforms = parseTags(row["플랫폼"]);
+          const rowTypes = parseTags(row["유형"]);
+          const rowTags = parseTags(row["태그"]);
+
+          rowPlatforms.forEach(v => newPlatforms.add(v));
+          rowTypes.forEach(v => newTypes.add(v));
+          rowTags.forEach(v => newTags.add(v));
+
           const accData = {
             owner: String(row["계정소유자"] || ""),
             group: String(row["그룹"] || ""),
-            platforms: parseTags(row["플랫폼"]),
-            types: parseTags(row["유형"]),
-            tags: parseTags(row["태그"]),
+            platforms: rowPlatforms,
+            types: rowTypes,
+            tags: rowTags,
             accessType: String(row["접속구분"] || "사이트"),
             siteName: String(row["사이트명"] || ""),
             url: url,
@@ -302,8 +315,19 @@ export default function App() {
           }
         }
 
+        const updatedPlatforms = [...newPlatforms];
+        const updatedTypes = [...newTypes];
+        const updatedTags = [...newTags];
+
         setAccounts(newAccounts);
-        await persist(newAccounts, services);
+        setPlatformOptions(updatedPlatforms);
+        setTypeOptions(updatedTypes);
+        setTagOptions(updatedTags);
+        await persist(newAccounts, services, {
+          platformOptions: updatedPlatforms,
+          typeOptions: updatedTypes,
+          tagOptions: updatedTags,
+        });
         showToast(`엑셀 가져오기 완료: ${addCount}건 추가, ${updateCount}건 수정`);
       } catch (err) {
         showToast("엑셀 파일 처리 중 오류가 발생했습니다.", "error");
