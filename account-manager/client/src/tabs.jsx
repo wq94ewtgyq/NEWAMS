@@ -65,15 +65,17 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
   };
 
   return (
-    <div style={{ overflowX: "auto" }}>
-      {hasAnyHighlight && (
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
-          <Btn small ghost onClick={onResetVisits}>접속음영 초기화</Btn>
-        </div>
-      )}
+    <div>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 1200 }}>
-        <thead>
-          <tr style={{ background: "#0b0e1a", borderBottom: `2px solid ${C.border}`, position: "sticky", top: 0, zIndex: 10 }}>
+        <thead style={{ position: "sticky", top: 0, zIndex: 10 }}>
+          {hasAnyHighlight && (
+            <tr style={{ background: "#0b0e1a" }}>
+              <th colSpan={11} style={{ padding: "6px 13px", textAlign: "right" }}>
+                <Btn small ghost onClick={onResetVisits}>접속음영 초기화</Btn>
+              </th>
+            </tr>
+          )}
+          <tr style={{ background: "#0b0e1a", borderBottom: `2px solid ${C.border}` }}>
             {["", "그룹", "유형", "태그", "사이트명", "아이디", "패스워드", "접속", "최근접속", "서비스", "액션"].map(h => (
               <th key={h} style={{ padding: "10px 13px", textAlign: "left", color: C.muted, fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{h}</th>
             ))}
@@ -228,10 +230,10 @@ export function ServicesTab({ services, accounts, onEdit, onRenew, onEnd, onReac
           </div>
         </div>
       )}
-      <div style={{ overflowX: "auto" }}>
+      <div>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 1000 }}>
-          <thead>
-            <tr style={{ background: "#0b0e1a", borderBottom: `2px solid ${C.border}`, position: "sticky", top: 0, zIndex: 10 }}>
+          <thead style={{ position: "sticky", top: 0, zIndex: 10 }}>
+            <tr style={{ background: "#0b0e1a", borderBottom: `2px solid ${C.border}` }}>
               {["상태","계정소유자","그룹","계정ID","서비스명","이용시작일","기간","만료일","D-day","비용","자동갱신","액션"].map(h => (
                 <th key={h} style={{ padding: "10px 13px", textAlign: "left", color: C.muted, fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{h}</th>
               ))}
