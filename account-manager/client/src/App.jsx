@@ -9,9 +9,10 @@ import { AccountsTab, ServicesTab } from "./tabs.jsx";
 // ─────────────────────────────────────────────────────
 function Logo() {
   return (
-    <div style={{ width: 40, height: 40, borderRadius: 11, background: "#e81e81", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
-      <svg viewBox="0 0 100 100" width="28" height="28" fill="none">
-        <text x="50" y="72" textAnchor="middle" fill="#fff" fontSize="62" fontWeight="bold" fontFamily="cursive, serif" style={{ fontStyle: "italic" }}>B</text>
+    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "#E81E1E", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+      <svg viewBox="0 0 200 200" width="32" height="32" fill="none">
+        <path d="M95 160c-8-4-16-12-20-22-3-8-2-14 2-16 5-3 8 1 12 8 3 5 6 8 8 6 3-2 2-8-2-18-6-14-10-28-8-36 2-10 8-16 16-14 6 2 10 8 10 16 0 6-2 10-4 10s-4-4-2-10c1-4 0-6-2-7-3-1-6 2-7 8-2 8 2 22 8 36 4 10 6 18 4 24-2 8-8 14-15 15z" fill="#fff" />
+        <path d="M80 130c-2-10 0-22 6-34 8-16 18-28 28-34 8-4 14-4 16 0 2 5-2 10-10 16-6 4-10 6-10 4s4-6 10-12c4-4 4-6 2-7-3-2-8 2-16 14-10 16-16 32-16 44 0 8 2 12-2 14-4 1-7-1-8-5z" fill="#fff" />
       </svg>
     </div>
   );
@@ -291,7 +292,7 @@ export default function App() {
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Pretendard','Noto Sans KR',sans-serif", color: C.text }}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      {saving && <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: 3, zIndex: 9998, background: `linear-gradient(90deg,${C.accent},#ff6b9d)` }} />}
+      {saving && <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: 3, zIndex: 9998, background: `linear-gradient(90deg,${C.accent},#ff4d4d)` }} />}
 
       {/* Header */}
       <div style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "16px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>

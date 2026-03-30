@@ -46,7 +46,7 @@ export function Btn({ children, onClick, small, accent, blue, danger, ghost, war
   else if (green)  { bg = C.green + "22";  color = C.green;  border = `1px solid ${C.green}44`; }
   else if (warn)   { bg = C.warn + "22";   color = C.warn;   border = `1px solid ${C.warn}44`; }
   else if (ghost)  { bg = "transparent";   color = C.muted;  border = `1px solid ${C.border2}`; }
-  else             { bg = `linear-gradient(135deg,${C.accent},#ff6b9d)`; color = "#fff"; border = "none"; }
+  else             { bg = `linear-gradient(135deg,${C.accent},#ff4d4d)`; color = "#fff"; border = "none"; }
   return (
     <button onClick={onClick} disabled={disabled} style={{
       background: bg, color, border, borderRadius: small ? 6 : 9,

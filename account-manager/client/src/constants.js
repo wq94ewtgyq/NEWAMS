@@ -54,12 +54,12 @@ export function fmtCost(v) {
 }
 
 // ─────────────────────────────────────────────────────
-// 색상 / 스타일 — 브랜드 컬러 #e81e81
+// 색상 / 스타일 — 브랜드 컬러 #E81E1E
 // ─────────────────────────────────────────────────────
 export const C = {
   bg: "#090c17", surface: "#0f1220", border: "#1c2238", border2: "#242b42",
   text: "#dde2f0", muted: "#5a647a",
-  accent: "#e81e81", blue: "#4d8cff", warn: "#f59e0b", danger: "#ff5f5f",
+  accent: "#E81E1E", blue: "#4d8cff", warn: "#f59e0b", danger: "#ff5f5f",
   ended: "#3a4050", green: "#00d4aa",
 };
 export const inputSt = {
@@ -69,7 +69,7 @@ export const inputSt = {
   width: "100%", boxSizing: "border-box",
 };
 export const tdSt = { padding: "11px 13px", verticalAlign: "middle", whiteSpace: "nowrap" };
-export const groupColors = { "메인": "#e81e81", "업무유틸": "#4d8cff", "데일리": "#f59e0b" };
+export const groupColors = { "메인": "#E81E1E", "업무유틸": "#4d8cff", "데일리": "#f59e0b" };
 
 // ─────────────────────────────────────────────────────
 // 인증방법 옵션

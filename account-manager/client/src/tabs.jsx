@@ -95,7 +95,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   <td style={tdSt} onClick={e => e.stopPropagation()}>
                     {a.url ? (
                       <a href={a.url.startsWith("http") ? a.url : `https://${a.url}`} target="_blank" rel="noreferrer"
-                        style={{ background: `linear-gradient(135deg,${C.accent},#ff6b9d)`, color: "#fff", borderRadius: 6, padding: "4px 12px", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
+                        style={{ background: `linear-gradient(135deg,${C.accent},#ff4d4d)`, color: "#fff", borderRadius: 6, padding: "4px 12px", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
                         접속하기
                       </a>
                     ) : <span style={{ color: C.muted }}>—</span>}
