@@ -28,7 +28,7 @@ export function IdCopyBtn({ text }) {
   const copy = e => { e.stopPropagation(); navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); };
   return (
     <button onClick={copy}
-      style={{ background: "none", border: "none", cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 14, padding: "0 2px", lineHeight: 1, transition: "color 0.15s" }}
+      style={{ background: "none", border: "none", cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 13, padding: 0, lineHeight: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, flexShrink: 0, transition: "color 0.15s" }}
       title={copied ? "복사됨" : "복사"}>
       {copied ? "✓" : "⧉"}
     </button>
@@ -44,7 +44,7 @@ export function PwCell({ value }) {
         {show ? value : "••••••"}
       </span>
       <button onClick={copy}
-        style={{ background: "none", border: "none", cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 14, padding: "0 2px", lineHeight: 1, transition: "color 0.15s" }}
+        style={{ background: "none", border: "none", cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 13, padding: 0, lineHeight: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, flexShrink: 0, transition: "color 0.15s" }}
         title={copied ? "복사됨" : "복사"}>
         {copied ? "✓" : "⧉"}
       </button>
