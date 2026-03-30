@@ -134,20 +134,22 @@ export function FilterSel({ label, value, options, onChange }) {
 }
 export function ButtonFilter({ label, options, selected, onChange, color = C.blue }) {
   const isAll = selected.length === 0;
+  const hasSelection = selected.length > 0;
   const toggle = (val) => {
     onChange(selected.includes(val) ? selected.filter(v => v !== val) : [...selected, val]);
   };
   if (options.length === 0) return null;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-      <span style={{ fontSize: 11, color: C.muted, fontWeight: 700, marginRight: 2, minWidth: 30 }}>{label}</span>
+    <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
+      <span style={{ fontSize: 11, color: hasSelection ? color : C.sub, fontWeight: 700, marginRight: 2, minWidth: 30 }}>{label}</span>
       <button onClick={() => onChange([])}
         style={{
-          background: isAll ? color + "25" : "transparent",
-          color: isAll ? color : C.muted,
-          border: `1px solid ${isAll ? color + "60" : C.border2}`,
-          borderRadius: 5, padding: "3px 9px", fontSize: 11, fontWeight: 600,
+          background: isAll ? color + "20" : "transparent",
+          color: isAll ? color : C.sub,
+          border: `1px solid ${isAll ? color + "40" : "transparent"}`,
+          borderRadius: 4, padding: "2px 8px", fontSize: 11, fontWeight: 600,
           cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s",
+          opacity: isAll ? 1 : 0.5,
         }}>
         전체
       </button>
@@ -156,11 +158,12 @@ export function ButtonFilter({ label, options, selected, onChange, color = C.blu
         return (
           <button key={o} onClick={() => toggle(o)}
             style={{
-              background: active ? color + "25" : "transparent",
-              color: active ? color : C.muted,
-              border: `1px solid ${active ? color + "60" : C.border2}`,
-              borderRadius: 5, padding: "3px 9px", fontSize: 11, fontWeight: 600,
+              background: active ? color + "20" : "transparent",
+              color: active ? color : C.sub,
+              border: `1px solid ${active ? color + "40" : "transparent"}`,
+              borderRadius: 4, padding: "2px 8px", fontSize: 11, fontWeight: active ? 700 : 500,
               cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s",
+              opacity: active ? 1 : (hasSelection ? 0.4 : 0.6),
             }}>
             {o}
           </button>

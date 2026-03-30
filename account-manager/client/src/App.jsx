@@ -486,39 +486,33 @@ export default function App() {
       </div>
 
       {/* Filter Bar */}
-      <div style={{ padding: "12px 28px", background: "#0f172a", borderBottom: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 8 }}>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <input placeholder="검색 1..." value={search1} onChange={e => setSearch1(e.target.value)} style={{ ...inputSt, width: 180, padding: "7px 12px" }} />
-          <input placeholder="검색 2..." value={search2} onChange={e => setSearch2(e.target.value)} style={{ ...inputSt, width: 180, padding: "7px 12px" }} />
+      <div style={{ background: "#0f172a", borderBottom: `1px solid ${C.border}`, display: "flex", flexDirection: "column" }}>
+        {/* 검색 + 옵션 */}
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", padding: "10px 28px", borderBottom: `1px solid ${C.border}` }}>
+          <input placeholder="검색..." value={search1} onChange={e => setSearch1(e.target.value)} style={{ ...inputSt, width: 200, padding: "6px 12px", fontSize: 12 }} />
+          <input placeholder="검색 2..." value={search2} onChange={e => setSearch2(e.target.value)} style={{ ...inputSt, width: 200, padding: "6px 12px", fontSize: 12 }} />
           <FilterSel label="소유자" value={filterOwner} options={ownerOptions} onChange={setFilterOwner} />
           <FilterSel label="서비스" value={filterService} options={["전체", "Y", "N"]} onChange={setFilterService} />
-          <div style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", marginLeft: 8 }} onClick={() => setShowEnded(s => !s)}>
-            <div style={{ width: 36, height: 20, borderRadius: 10, position: "relative", background: showEnded ? C.warn + "88" : C.border, border: `1px solid ${showEnded ? C.warn : C.border2}`, transition: "background 0.2s" }}>
-              <div style={{ position: "absolute", top: 2, left: showEnded ? 16 : 2, width: 14, height: 14, borderRadius: 7, background: showEnded ? C.warn : C.sub, transition: "left 0.2s" }} />
-            </div>
-            <span style={{ fontSize: 12, color: C.muted, userSelect: "none" }}>이용종료 포함 {endedCount > 0 && `(${endedCount})`}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
+            <button onClick={() => setShowEnded(s => !s)}
+              style={{ background: showEnded ? C.warn + "18" : "transparent", color: showEnded ? C.warn : C.sub, border: `1px solid ${showEnded ? C.warn + "40" : "transparent"}`, borderRadius: 4, padding: "3px 10px", fontSize: 11, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s" }}>
+              이용종료 포함 {endedCount > 0 && `(${endedCount})`}
+            </button>
+            <button onClick={() => setShowInactive(s => !s)}
+              style={{ background: showInactive ? C.muted + "18" : "transparent", color: showInactive ? C.text : C.sub, border: `1px solid ${showInactive ? C.muted + "40" : "transparent"}`, borderRadius: 4, padding: "3px 10px", fontSize: 11, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s" }}>
+              비활성 포함 {inactiveCount > 0 && `(${inactiveCount})`}
+            </button>
+            {accounts.some(a => a.visitHighlight) && (
+              <button onClick={resetVisits} style={{ background: "none", border: "none", color: C.sub, cursor: "pointer", fontSize: 11, padding: "3px 8px", textDecoration: "underline" }}>음영초기화</button>
+            )}
+            <span style={{ fontSize: 11, color: C.sub, marginLeft: 8 }}>{tab === "accounts" ? `${filteredAccounts.length}개` : `${filteredServices.length}개`}</span>
           </div>
-          <button onClick={() => setShowInactive(s => !s)}
-            style={{
-              background: showInactive ? C.muted + "25" : "transparent",
-              color: showInactive ? C.text : C.muted,
-              border: `1px solid ${showInactive ? C.muted + "60" : C.border2}`,
-              borderRadius: 5, padding: "4px 12px", fontSize: 11, fontWeight: 600,
-              cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s",
-            }}>
-            비활성 포함 {inactiveCount > 0 && `(${inactiveCount})`}
-          </button>
-          <span style={{ fontSize: 11, color: C.muted, marginLeft: "auto" }}>{tab === "accounts" ? `${filteredAccounts.length}개` : `${filteredServices.length}개`} 표시</span>
         </div>
-        <ButtonFilter label="그룹" options={groupOptions} selected={filterGroups} onChange={setFilterGroups} color="#a78bfa" />
-        <ButtonFilter label="유형" options={filteredTypeOptions} selected={filterTypes} onChange={setFilterTypes} color={C.blue} />
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <div style={{ flex: 1 }}>
-            <ButtonFilter label="태그" options={filteredTagOptions} selected={filterTags} onChange={setFilterTags} color={C.green} />
-          </div>
-          {accounts.some(a => a.visitHighlight) && (
-            <Btn small ghost onClick={resetVisits}>접속음영 초기화</Btn>
-          )}
+        {/* 버튼 필터 */}
+        <div style={{ padding: "8px 28px", display: "flex", flexDirection: "column", gap: 4 }}>
+          <ButtonFilter label="그룹" options={groupOptions} selected={filterGroups} onChange={setFilterGroups} color="#a78bfa" />
+          <ButtonFilter label="유형" options={filteredTypeOptions} selected={filterTypes} onChange={setFilterTypes} color={C.blue} />
+          <ButtonFilter label="태그" options={filteredTagOptions} selected={filterTags} onChange={setFilterTags} color={C.green} />
         </div>
       </div>
 
