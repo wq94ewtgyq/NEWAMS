@@ -137,7 +137,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                     </div>
                   </td>
                   <td style={tdSt}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, opacity: 0.7 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ fontFamily: "monospace", color: C.muted, fontSize: 12 }}>{a.username || "—"}</span>
                       {a.username && <IdCopyBtn text={a.username} />}
                     </div>
