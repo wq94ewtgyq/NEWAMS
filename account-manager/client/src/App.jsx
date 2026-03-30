@@ -9,7 +9,7 @@ import { AccountsTab, ServicesTab } from "./tabs.jsx";
 // ─────────────────────────────────────────────────────
 function Logo() {
   return (
-    <img src="/logo.svg" alt="ROUTE BY" style={{ width: 40, height: 40, borderRadius: "50%", flexShrink: 0 }} />
+    <img src="/logo.png" alt="ROUTE BY" style={{ width: 40, height: 40, borderRadius: "50%", flexShrink: 0 }} />
   );
 }
 
