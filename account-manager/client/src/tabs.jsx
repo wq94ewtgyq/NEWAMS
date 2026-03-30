@@ -46,11 +46,16 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
 
   const fmtVisit = (iso) => {
     if (!iso) return "—";
-    const d = new Date(iso);
-    return d.toLocaleString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+    const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+    if (diff < 1) return "방금 전";
+    if (diff < 60) return `${diff}분 전`;
+    const hours = Math.floor(diff / 60);
+    if (hours < 24) return `${hours}시간 전`;
+    const days = Math.floor(hours / 24);
+    return `${days}일 전`;
   };
 
-  const hasAnyVisit = accounts.some(a => a.lastVisited);
+  const hasAnyHighlight = accounts.some(a => a.visitHighlight);
 
   const getLinkedLabel = (linkedId) => {
     if (!linkedId) return "—";
@@ -61,7 +66,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
 
   return (
     <div style={{ overflowX: "auto" }}>
-      {hasAnyVisit && (
+      {hasAnyHighlight && (
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
           <Btn small ghost onClick={onResetVisits}>접속음영 초기화</Btn>
         </div>
@@ -78,7 +83,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
           {accounts.map((a, i) => {
             const svcs = svcByAcc(a.id);
             const isOpen = expanded[a.id];
-            const isVisited = !!a.lastVisited;
+            const isVisited = !!a.visitHighlight;
             const rowBg = isVisited ? "#1a1510" : (i % 2 === 0 ? C.bg : "#0c0f1c");
             const activeCount = svcs.filter(s => s.status === "active").length;
             const isInactive = a.status === "inactive";

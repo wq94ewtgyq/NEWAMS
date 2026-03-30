@@ -63,8 +63,8 @@ export default function App() {
     loadData()
       .then(data => {
         const accs = (data.accounts || []).map(a => {
-          if (a.lastVisited && a.lastVisited.slice(0, 10) !== todayStr) {
-            return { ...a, lastVisited: "" };
+          if (a.visitHighlight && (!a.lastVisited || a.lastVisited.slice(0, 10) !== todayStr)) {
+            return { ...a, visitHighlight: false };
           }
           return a;
         });
@@ -210,13 +210,13 @@ export default function App() {
 
   const visitAccount = async id => {
     const now = new Date().toISOString();
-    const nextAcc = accounts.map(a => a.id === id ? { ...a, lastVisited: now } : a);
+    const nextAcc = accounts.map(a => a.id === id ? { ...a, lastVisited: now, visitHighlight: true } : a);
     setAccounts(nextAcc);
     await persist(nextAcc, services);
   };
 
   const resetVisits = async () => {
-    const nextAcc = accounts.map(a => a.lastVisited ? { ...a, lastVisited: "" } : a);
+    const nextAcc = accounts.map(a => a.visitHighlight ? { ...a, visitHighlight: false } : a);
     setAccounts(nextAcc);
     await persist(nextAcc, services);
     showToast("접속 음영이 초기화되었습니다.");
