@@ -53,6 +53,7 @@ export default function App() {
   const [managePlatforms, setManagePlatforms]    = useState(false);
   const [manageTypes, setManageTypes]            = useState(false);
   const [manageTags, setManageTags]              = useState(false);
+  const [showTrash, setShowTrash]                = useState(false);
   const [filterPlatform, setFilterPlatform]      = useState("전체");
   const [filterType, setFilterType]              = useState("전체");
   const [filterTag, setFilterTag]                = useState("전체");
@@ -105,7 +106,10 @@ export default function App() {
   const allTypes = useMemo(() => ["전체", ...new Set(accounts.flatMap(a => a.types || []))], [accounts]);
   const allTags = useMemo(() => ["전체", ...new Set(accounts.flatMap(a => a.tags || []))], [accounts]);
 
-  const filteredAccounts = useMemo(() => accounts.filter(a => {
+  const activeAccounts = useMemo(() => accounts.filter(a => a.status !== "deleted"), [accounts]);
+  const deletedAccounts = useMemo(() => accounts.filter(a => a.status === "deleted"), [accounts]);
+
+  const filteredAccounts = useMemo(() => activeAccounts.filter(a => {
     const q1 = search1.toLowerCase();
     const q2 = search2.toLowerCase();
     const matchOwner = filterOwner === "전체" || a.owner === filterOwner;
@@ -128,7 +132,7 @@ export default function App() {
     }
 
     return matchOwner && matchGroup && matchPlatform && matchType && matchTag && matchQ1 && matchQ2 && matchService;
-  }), [accounts, search1, search2, filterOwner, filterGroup, filterPlatform, filterType, filterTag, filterService, services]);
+  }), [activeAccounts, search1, search2, filterOwner, filterGroup, filterPlatform, filterType, filterTag, filterService, services]);
 
   const filteredServices = useMemo(() => {
     const accIds = new Set(filteredAccounts.map(a => a.id));
@@ -166,17 +170,32 @@ export default function App() {
 
   const saveAcc = async () => {
     const next = accModal.mode === "add"
-      ? [...accounts, { ...accForm, id: uid() }]
-      : accounts.map(a => a.id === accModal.id ? { ...accForm, id: a.id } : a);
+      ? [...accounts, { ...accForm, id: uid(), status: "active" }]
+      : accounts.map(a => a.id === accModal.id ? { ...accForm, id: a.id, status: a.status || "active" } : a);
     setAccounts(next); setAccModal(null);
     await persist(next, services);
   };
 
   const deleteAcc = async id => {
+    const nextAcc = accounts.map(a => a.id === id ? { ...a, status: "deleted" } : a);
+    setAccounts(nextAcc); setDelConfirm(null);
+    await persist(nextAcc, services);
+    showToast("삭제된 계정으로 이동되었습니다. 복구 가능합니다.");
+  };
+
+  const restoreAcc = async id => {
+    const nextAcc = accounts.map(a => a.id === id ? { ...a, status: "active" } : a);
+    setAccounts(nextAcc);
+    await persist(nextAcc, services);
+    showToast("계정이 복구되었습니다.");
+  };
+
+  const permanentDeleteAcc = async id => {
     const nextAcc = accounts.filter(a => a.id !== id);
     const nextSvc = services.filter(s => s.accountId !== id);
-    setAccounts(nextAcc); setServices(nextSvc); setDelConfirm(null);
+    setAccounts(nextAcc); setServices(nextSvc);
     await persist(nextAcc, nextSvc);
+    showToast("계정이 완전 삭제되었습니다.");
   };
 
   // ── 서비스 CRUD ──
@@ -381,7 +400,7 @@ export default function App() {
           <div>
             <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", letterSpacing: -0.5 }}>ROUTE BY <span style={{ color: C.accent }}>계정 관리</span></div>
             <div style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>
-              계정 {accounts.length}개 · 서비스 {services.filter(s => s.status === "active").length}개 이용중
+              계정 {activeAccounts.length}개 · 서비스 {services.filter(s => s.status === "active").length}개 이용중
               {alertCount > 0 && <span style={{ color: C.warn, marginLeft: 8 }}>⚠ 만료 임박 {alertCount}건</span>}
               {endedCount > 0 && <span style={{ color: C.ended, marginLeft: 8 }}>· 종료 {endedCount}건</span>}
               {saving && <span style={{ color: C.accent, marginLeft: 8 }}>저장 중...</span>}
@@ -390,6 +409,11 @@ export default function App() {
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <input ref={fileInputRef} type="file" accept=".xlsx,.xls" onChange={importExcel} style={{ display: "none" }} />
+          {deletedAccounts.length > 0 && (
+            <Btn danger onClick={() => setShowTrash(true)} disabled={saving}>
+              삭제된 계정 ({deletedAccounts.length})
+            </Btn>
+          )}
           <Btn ghost onClick={() => fileInputRef.current?.click()} disabled={saving}>엑셀 가져오기</Btn>
           <Btn ghost onClick={exportExcel} disabled={saving}>엑셀 내보내기</Btn>
           <Btn onClick={() => tab === "accounts" ? openAddAcc() : openAddSvc()} disabled={saving}>
@@ -474,7 +498,7 @@ export default function App() {
           <h3 style={{ color: "#fff", margin: "0 0 8px", fontSize: 17 }}>삭제하시겠습니까?</h3>
           <p style={{ color: C.muted, fontSize: 13, margin: "0 0 22px" }}>
             <strong style={{ color: C.text }}>{delConfirm?.label}</strong>
-            {delConfirm?.type === "account" && <span style={{ color: C.danger }}><br />연결된 서비스도 모두 삭제됩니다.</span>}
+            {delConfirm?.type === "account" && <span style={{ color: C.warn }}><br />삭제된 계정에서 복구할 수 있습니다.</span>}
           </p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
             <Btn ghost onClick={() => setDelConfirm(null)} disabled={saving}>취소</Btn>
@@ -521,6 +545,32 @@ export default function App() {
       {/* 태그 관리 */}
       <ManageListModal open={manageTags} onClose={() => setManageTags(false)}
         title="태그 관리" items={tagOptions} onSave={saveTagOpts} />
+
+      {/* 삭제된 계정 */}
+      <Modal open={showTrash} onClose={() => setShowTrash(false)} wide>
+        <ModalHeader title={`삭제된 계정 (${deletedAccounts.length})`} onClose={() => setShowTrash(false)} />
+        <div style={{ maxHeight: 450, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
+          {deletedAccounts.map(a => (
+            <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: C.bg, border: `1px solid ${C.border}`, borderRadius: 9 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span style={{ fontWeight: 700, color: "#fff", fontSize: 13 }}>{a.owner || "—"}</span>
+                  {a.group && <span style={{ background: C.muted + "20", color: C.muted, borderRadius: 4, padding: "1px 6px", fontSize: 11 }}>{a.group}</span>}
+                  <span style={{ color: C.accent, fontFamily: "monospace", fontSize: 12 }}>{a.username || "—"}</span>
+                  <span style={{ color: C.muted, fontSize: 11 }}>{a.siteName || a.url || ""}</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                <Btn small green onClick={() => restoreAcc(a.id)} disabled={saving}>복구</Btn>
+                <Btn small danger onClick={() => permanentDeleteAcc(a.id)} disabled={saving}>완전삭제</Btn>
+              </div>
+            </div>
+          ))}
+          {deletedAccounts.length === 0 && (
+            <div style={{ textAlign: "center", color: C.muted, padding: 40, fontSize: 13 }}>삭제된 계정이 없습니다.</div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }
