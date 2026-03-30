@@ -153,7 +153,16 @@ export default function App() {
 
   // ── 계정 CRUD ──
   const openAddAcc  = () => { setAccForm({ ...emptyAccount }); setAccModal({ mode: "add" }); };
-  const openEditAcc = a  => { setAccForm({ ...a, authInfos: a.authInfos || [{ method: "없음", contact: "" }] }); setAccModal({ mode: "edit", id: a.id }); };
+  const openEditAcc = a  => {
+    setAccForm({
+      ...a,
+      platforms: a.platforms || [],
+      types: a.types || [],
+      tags: a.tags || [],
+      authInfos: a.authInfos || [{ method: "없음", contact: "" }],
+    });
+    setAccModal({ mode: "edit", id: a.id });
+  };
 
   const saveAcc = async () => {
     const next = accModal.mode === "add"
@@ -253,6 +262,7 @@ export default function App() {
 
         const newAccounts = [...accounts];
         let addCount = 0, updateCount = 0;
+        const parseTags = str => String(str || "").split(",").map(s => s.trim()).filter(Boolean);
 
         for (const row of rows) {
           const username = String(row["아이디"] || "").trim();
@@ -266,8 +276,6 @@ export default function App() {
             const [method, contact] = s.split(":");
             return { method: method || "없음", contact: contact || "" };
           }) : [{ method: "없음", contact: "" }];
-
-          const parseTags = str => String(str || "").split(",").map(s => s.trim()).filter(Boolean);
           const accData = {
             owner: String(row["계정소유자"] || ""),
             group: String(row["그룹"] || ""),
