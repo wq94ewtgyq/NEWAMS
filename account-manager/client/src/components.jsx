@@ -127,6 +127,38 @@ export function FilterSel({ label, value, options, onChange }) {
     </div>
   );
 }
+export function ButtonFilter({ label, options, selected, onChange, color = C.blue }) {
+  const toggle = (val) => {
+    onChange(selected.includes(val) ? selected.filter(v => v !== val) : [...selected, val]);
+  };
+  if (options.length === 0) return null;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
+      <span style={{ fontSize: 11, color: C.muted, fontWeight: 700, marginRight: 2 }}>{label}</span>
+      {options.map(o => {
+        const active = selected.includes(o);
+        return (
+          <button key={o} onClick={() => toggle(o)}
+            style={{
+              background: active ? color + "25" : "transparent",
+              color: active ? color : C.muted,
+              border: `1px solid ${active ? color + "60" : C.border2}`,
+              borderRadius: 5, padding: "3px 9px", fontSize: 11, fontWeight: 600,
+              cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s",
+            }}>
+            {o}
+          </button>
+        );
+      })}
+      {selected.length > 0 && (
+        <button onClick={() => onChange([])}
+          style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 10, padding: "3px 4px", textDecoration: "underline" }}>
+          해제
+        </button>
+      )}
+    </div>
+  );
+}
 
 // ─────────────────────────────────────────────────────
 // 검색형 드롭다운

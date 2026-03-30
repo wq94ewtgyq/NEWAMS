@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import * as XLSX from "xlsx";
 import { C, inputSt, groupColors, loadData, saveAllData, calcExpiry, daysLeft, uid, emptyAccount, emptyService } from "./constants.js";
-import { Btn, Modal, ModalHeader, ModalFooter, FilterSel, Toast, Spinner, AccountForm, ServiceForm, ManageListModal } from "./components.jsx";
+import { Btn, Modal, ModalHeader, ModalFooter, FilterSel, ButtonFilter, Toast, Spinner, AccountForm, ServiceForm, ManageListModal } from "./components.jsx";
 import { AccountsTab, ServicesTab } from "./tabs.jsx";
 
 // ─────────────────────────────────────────────────────
@@ -37,7 +37,10 @@ export default function App() {
   const [search1, setSearch1]             = useState("");
   const [search2, setSearch2]             = useState("");
   const [filterOwner, setFilterOwner]     = useState("전체");
-  const [filterGroup, setFilterGroup]     = useState("전체");
+  const [filterGroups, setFilterGroups]       = useState([]);
+  const [filterPlatforms, setFilterPlatforms]  = useState([]);
+  const [filterTypes, setFilterTypes]          = useState([]);
+  const [filterTags, setFilterTags]            = useState([]);
   const [filterService, setFilterService] = useState("전체");
   const [showEnded, setShowEnded]         = useState(false);
 
@@ -54,9 +57,6 @@ export default function App() {
   const [manageTypes, setManageTypes]            = useState(false);
   const [manageTags, setManageTags]              = useState(false);
   const [showTrash, setShowTrash]                = useState(false);
-  const [filterPlatform, setFilterPlatform]      = useState("전체");
-  const [filterType, setFilterType]              = useState("전체");
-  const [filterTag, setFilterTag]                = useState("전체");
 
   const fileInputRef = useRef(null);
 
@@ -100,11 +100,10 @@ export default function App() {
   }, [showToast, accounts, services, owners, groups, platformOptions, typeOptions, tagOptions]);
 
   const ownerOptions = useMemo(() => ["전체", ...new Set(accounts.map(a => a.owner).filter(Boolean))], [accounts]);
-  const groupOptions = useMemo(() => ["전체", ...new Set(accounts.map(a => a.group).filter(Boolean))], [accounts]);
-
-  const allPlatforms = useMemo(() => ["전체", ...new Set(accounts.flatMap(a => a.platforms || []))], [accounts]);
-  const allTypes = useMemo(() => ["전체", ...new Set(accounts.flatMap(a => a.types || []))], [accounts]);
-  const allTags = useMemo(() => ["전체", ...new Set(accounts.flatMap(a => a.tags || []))], [accounts]);
+  const groupOptions = useMemo(() => [...new Set(accounts.map(a => a.group).filter(Boolean))], [accounts]);
+  const allPlatforms = useMemo(() => [...new Set(accounts.flatMap(a => a.platforms || []))], [accounts]);
+  const allTypes = useMemo(() => [...new Set(accounts.flatMap(a => a.types || []))], [accounts]);
+  const allTags = useMemo(() => [...new Set(accounts.flatMap(a => a.tags || []))], [accounts]);
 
   const activeAccounts = useMemo(() => accounts.filter(a => a.status !== "deleted"), [accounts]);
   const deletedAccounts = useMemo(() => accounts.filter(a => a.status === "deleted"), [accounts]);
@@ -113,10 +112,10 @@ export default function App() {
     const q1 = search1.toLowerCase();
     const q2 = search2.toLowerCase();
     const matchOwner = filterOwner === "전체" || a.owner === filterOwner;
-    const matchGroup = filterGroup === "전체" || a.group === filterGroup;
-    const matchPlatform = filterPlatform === "전체" || (a.platforms || []).includes(filterPlatform);
-    const matchType = filterType === "전체" || (a.types || []).includes(filterType);
-    const matchTag = filterTag === "전체" || (a.tags || []).includes(filterTag);
+    const matchGroup = filterGroups.length === 0 || filterGroups.includes(a.group);
+    const matchPlatform = filterPlatforms.length === 0 || (a.platforms || []).some(p => filterPlatforms.includes(p));
+    const matchType = filterTypes.length === 0 || (a.types || []).some(t => filterTypes.includes(t));
+    const matchTag = filterTags.length === 0 || (a.tags || []).some(t => filterTags.includes(t));
     const vals = Object.values(a).map(v => {
       if (Array.isArray(v)) return v.map(x => typeof x === "object" ? Object.values(x).join(" ") : String(x)).join(" ");
       return String(v);
@@ -132,7 +131,7 @@ export default function App() {
     }
 
     return matchOwner && matchGroup && matchPlatform && matchType && matchTag && matchQ1 && matchQ2 && matchService;
-  }), [activeAccounts, search1, search2, filterOwner, filterGroup, filterPlatform, filterType, filterTag, filterService, services]);
+  }), [activeAccounts, search1, search2, filterOwner, filterGroups, filterPlatforms, filterTypes, filterTags, filterService, services]);
 
   const filteredServices = useMemo(() => {
     const accIds = new Set(filteredAccounts.map(a => a.id));
@@ -430,22 +429,26 @@ export default function App() {
       </div>
 
       {/* Filter Bar */}
-      <div style={{ padding: "12px 28px", background: "#0b0e1a", borderBottom: `1px solid ${C.border}`, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-        <input placeholder="검색 1..." value={search1} onChange={e => setSearch1(e.target.value)} style={{ ...inputSt, width: 180, background: C.bg, padding: "7px 12px" }} />
-        <input placeholder="검색 2..." value={search2} onChange={e => setSearch2(e.target.value)} style={{ ...inputSt, width: 180, background: C.bg, padding: "7px 12px" }} />
-        <FilterSel label="소유자" value={filterOwner} options={ownerOptions} onChange={setFilterOwner} />
-        <FilterSel label="그룹"   value={filterGroup}  options={groupOptions}  onChange={setFilterGroup} />
-        <FilterSel label="플랫폼" value={filterPlatform} options={allPlatforms} onChange={setFilterPlatform} />
-        <FilterSel label="유형"   value={filterType}     options={allTypes}     onChange={setFilterType} />
-        <FilterSel label="태그"   value={filterTag}      options={allTags}      onChange={setFilterTag} />
-        <FilterSel label="서비스" value={filterService} options={["전체", "Y", "N"]} onChange={setFilterService} />
-        <div style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", marginLeft: 8 }} onClick={() => setShowEnded(s => !s)}>
-          <div style={{ width: 36, height: 20, borderRadius: 10, position: "relative", background: showEnded ? C.warn + "88" : "#1e2540", border: `1px solid ${showEnded ? C.warn : C.border2}`, transition: "background 0.2s" }}>
-            <div style={{ position: "absolute", top: 2, left: showEnded ? 16 : 2, width: 14, height: 14, borderRadius: 7, background: showEnded ? C.warn : "#5a647a", transition: "left 0.2s" }} />
+      <div style={{ padding: "12px 28px", background: "#0b0e1a", borderBottom: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <input placeholder="검색 1..." value={search1} onChange={e => setSearch1(e.target.value)} style={{ ...inputSt, width: 180, background: C.bg, padding: "7px 12px" }} />
+          <input placeholder="검색 2..." value={search2} onChange={e => setSearch2(e.target.value)} style={{ ...inputSt, width: 180, background: C.bg, padding: "7px 12px" }} />
+          <FilterSel label="소유자" value={filterOwner} options={ownerOptions} onChange={setFilterOwner} />
+          <FilterSel label="서비스" value={filterService} options={["전체", "Y", "N"]} onChange={setFilterService} />
+          <div style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", marginLeft: 8 }} onClick={() => setShowEnded(s => !s)}>
+            <div style={{ width: 36, height: 20, borderRadius: 10, position: "relative", background: showEnded ? C.warn + "88" : "#1e2540", border: `1px solid ${showEnded ? C.warn : C.border2}`, transition: "background 0.2s" }}>
+              <div style={{ position: "absolute", top: 2, left: showEnded ? 16 : 2, width: 14, height: 14, borderRadius: 7, background: showEnded ? C.warn : "#5a647a", transition: "left 0.2s" }} />
+            </div>
+            <span style={{ fontSize: 12, color: C.muted, userSelect: "none" }}>이용종료 포함 {endedCount > 0 && `(${endedCount})`}</span>
           </div>
-          <span style={{ fontSize: 12, color: C.muted, userSelect: "none" }}>이용종료 포함 {endedCount > 0 && `(${endedCount})`}</span>
+          <span style={{ fontSize: 11, color: C.muted, marginLeft: "auto" }}>{tab === "accounts" ? `${filteredAccounts.length}개` : `${filteredServices.length}개`} 표시</span>
         </div>
-        <span style={{ fontSize: 11, color: C.muted, marginLeft: "auto" }}>{tab === "accounts" ? `${filteredAccounts.length}개` : `${filteredServices.length}개`} 표시</span>
+        <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+          <ButtonFilter label="그룹" options={groupOptions} selected={filterGroups} onChange={setFilterGroups} color={C.accent} />
+          <ButtonFilter label="플랫폼" options={allPlatforms} selected={filterPlatforms} onChange={setFilterPlatforms} color="#e07c24" />
+          <ButtonFilter label="유형" options={allTypes} selected={filterTypes} onChange={setFilterTypes} color={C.blue} />
+          <ButtonFilter label="태그" options={allTags} selected={filterTags} onChange={setFilterTags} color={C.green} />
+        </div>
       </div>
 
       {/* Body */}
