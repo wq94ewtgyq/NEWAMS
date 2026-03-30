@@ -306,70 +306,76 @@ export function ManageListModal({ open, onClose, title, items, onSave }) {
 }
 
 // ─────────────────────────────────────────────────────
-// 카테고리 관리 모달 (구분 > 세부구분 계층)
+// 멀티 태그 입력 (다중 선택, 검색형)
 // ─────────────────────────────────────────────────────
-export function ManageCategoryModal({ open, onClose, categories, onSave }) {
-  const [cats, setCats] = useState([]);
-  const [newCat, setNewCat] = useState("");
-  const [newSubs, setNewSubs] = useState({});
+export function MultiTagInput({ selected = [], onChange, options = [], onManage, placeholder = "검색 후 선택...", color = C.blue }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const ref = useRef(null);
 
-  useEffect(() => { if (open) { setCats(categories.map(c => ({ ...c, subcategories: [...c.subcategories] }))); setNewSubs({}); } }, [open, categories]);
+  useEffect(() => {
+    const handler = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
-  const addCat = () => {
-    const v = newCat.trim();
-    if (v && !cats.find(c => c.name === v)) { setCats([...cats, { name: v, subcategories: [] }]); setNewCat(""); }
-  };
-  const removeCat = idx => setCats(cats.filter((_, i) => i !== idx));
-  const addSub = (catIdx) => {
-    const v = (newSubs[catIdx] || "").trim();
-    if (!v) return;
-    const next = cats.map((c, i) => i === catIdx && !c.subcategories.includes(v) ? { ...c, subcategories: [...c.subcategories, v] } : c);
-    setCats(next);
-    setNewSubs({ ...newSubs, [catIdx]: "" });
-  };
-  const removeSub = (catIdx, subIdx) => {
-    const next = cats.map((c, i) => i === catIdx ? { ...c, subcategories: c.subcategories.filter((_, j) => j !== subIdx) } : c);
-    setCats(next);
-  };
-  const save = () => { onSave(cats); onClose(); };
+  const filtered = options.filter(o => !selected.includes(o) && o.toLowerCase().includes(query.toLowerCase()));
 
-  if (!open) return null;
+  const add = (val) => { onChange([...selected, val]); setQuery(""); };
+  const remove = (val) => onChange(selected.filter(v => v !== val));
+
   return (
-    <Modal open={open} onClose={onClose} wide>
-      <ModalHeader title="구분 / 세부구분 관리" onClose={onClose} />
-      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-        <input value={newCat} onChange={e => setNewCat(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && addCat()}
-          placeholder="새 구분 입력..." style={{ ...inputSt, flex: 1 }} />
-        <Btn accent small onClick={addCat}>구분 추가</Btn>
-      </div>
-      <div style={{ maxHeight: 400, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10 }}>
-        {cats.map((cat, ci) => (
-          <div key={ci} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 9, padding: 14 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-              <span style={{ color: C.accent, fontWeight: 700, fontSize: 14 }}>{cat.name}</span>
-              <button onClick={() => removeCat(ci)} style={{ background: "none", border: "none", color: C.danger, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>✕ 삭제</button>
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
-              {cat.subcategories.map((sub, si) => (
-                <span key={si} style={{ display: "inline-flex", alignItems: "center", gap: 4, background: C.blue + "15", color: C.blue, border: `1px solid ${C.blue}30`, borderRadius: 5, padding: "3px 8px", fontSize: 12 }}>
-                  {sub}
-                  <button onClick={() => removeSub(ci, si)} style={{ background: "none", border: "none", color: C.danger, cursor: "pointer", fontSize: 11, padding: 0 }}>✕</button>
-                </span>
-              ))}
-            </div>
-            <div style={{ display: "flex", gap: 6 }}>
-              <input value={newSubs[ci] || ""} onChange={e => setNewSubs({ ...newSubs, [ci]: e.target.value })}
-                onKeyDown={e => e.key === "Enter" && addSub(ci)}
-                placeholder="세부구분 입력..." style={{ ...inputSt, flex: 1, padding: "5px 10px", fontSize: 12 }} />
-              <Btn blue small onClick={() => addSub(ci)}>추가</Btn>
-            </div>
-          </div>
+    <div ref={ref} style={{ position: "relative" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, padding: selected.length > 0 ? "4px 0 4px" : 0, marginBottom: selected.length > 0 ? 4 : 0 }}>
+        {selected.map(tag => (
+          <span key={tag} style={{
+            display: "inline-flex", alignItems: "center", gap: 3,
+            background: color + "18", color, border: `1px solid ${color}35`,
+            borderRadius: 5, padding: "2px 8px", fontSize: 11, fontWeight: 600,
+          }}>
+            {tag}
+            <button onClick={() => remove(tag)} style={{ background: "none", border: "none", color: C.danger, cursor: "pointer", fontSize: 10, padding: 0, lineHeight: 1 }}>✕</button>
+          </span>
         ))}
-        {cats.length === 0 && <div style={{ textAlign: "center", color: C.muted, padding: 30, fontSize: 12 }}>구분이 없습니다. 위에서 추가해주세요.</div>}
       </div>
-      <ModalFooter onCancel={onClose} onSave={save} />
-    </Modal>
+      <div style={{ display: "flex", gap: 4 }}>
+        <input
+          value={query}
+          onChange={e => { setQuery(e.target.value); if (!open) setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          placeholder={placeholder}
+          style={{ ...inputSt, flex: 1 }}
+        />
+        {onManage && (
+          <button onClick={onManage} title="관리"
+            style={{ ...inputSt, width: 36, padding: 0, textAlign: "center", cursor: "pointer", flexShrink: 0, fontSize: 14 }}>
+            ⚙
+          </button>
+        )}
+      </div>
+      {open && filtered.length > 0 && (
+        <div style={{
+          position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
+          background: "#0a0d18", border: `1px solid ${C.border2}`, borderRadius: 7,
+          maxHeight: 180, overflowY: "auto", marginTop: 2,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+        }}>
+          {filtered.map((o, i) => (
+            <div key={i}
+              onClick={() => { add(o); }}
+              style={{
+                padding: "7px 12px", cursor: "pointer", fontSize: 12, color: C.text,
+                borderBottom: `1px solid ${C.border}`,
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = color + "20"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+              {o}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -417,11 +423,8 @@ export function Spinner() {
 // ─────────────────────────────────────────────────────
 // 계정 폼
 // ─────────────────────────────────────────────────────
-export function AccountForm({ form, setForm, owners, groups, categories, accounts, onManageOwners, onManageGroups, onManageCategories }) {
+export function AccountForm({ form, setForm, owners, groups, platformOptions, typeOptions, tagOptions, accounts, onManageOwners, onManageGroups, onManagePlatforms, onManageTypes, onManageTags }) {
   const f = k => v => setForm(p => ({ ...p, [k]: v }));
-
-  const selectedCat = categories.find(c => c.name === form.category);
-  const subcategories = selectedCat ? selectedCat.subcategories : [];
 
   const linkedOptions = accounts
     .filter(a => a.id !== form.id)
@@ -442,17 +445,19 @@ export function AccountForm({ form, setForm, owners, groups, categories, account
           <FieldRow label="그룹">
             <SearchableDropdown value={form.group} onChange={f("group")} options={groups} onManage={onManageGroups} placeholder="그룹 검색..." />
           </FieldRow>
-          <FieldRow label="구분">
-            <SearchableDropdown
-              value={form.category} onChange={v => { f("category")(v); f("subcategory")(""); }}
-              options={categories.map(c => c.name)} onManage={onManageCategories} placeholder="구분 검색..."
-            />
-          </FieldRow>
-          <FieldRow label="세부구분">
-            <SearchableDropdown value={form.subcategory} onChange={f("subcategory")} options={subcategories} placeholder="세부구분 검색..." />
-          </FieldRow>
           <FieldRow label="접속구분"><Sel value={form.accessType} onChange={f("accessType")} options={["사이트", "프로그램", "앱"]} /></FieldRow>
           <FieldRow label="로그인방법"><Sel value={form.loginMethod} onChange={f("loginMethod")} options={["일반", "간편로그인", "SSO"]} /></FieldRow>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px 16px", marginTop: 10 }}>
+          <FieldRow label="플랫폼">
+            <MultiTagInput selected={form.platforms || []} onChange={f("platforms")} options={platformOptions} onManage={onManagePlatforms} placeholder="플랫폼 검색..." color={C.accent} />
+          </FieldRow>
+          <FieldRow label="유형">
+            <MultiTagInput selected={form.types || []} onChange={f("types")} options={typeOptions} onManage={onManageTypes} placeholder="유형 검색..." color={C.blue} />
+          </FieldRow>
+          <FieldRow label="태그">
+            <MultiTagInput selected={form.tags || []} onChange={f("tags")} options={tagOptions} onManage={onManageTags} placeholder="태그 검색..." color={C.green} />
+          </FieldRow>
         </div>
       </div>
       <div>
@@ -465,7 +470,7 @@ export function AccountForm({ form, setForm, owners, groups, categories, account
               value={linkedDisplay}
               onChange={f("linkedAccount")}
               options={[{ value: "", label: "— 없음 —" }, ...linkedOptions]}
-              placeholder="연동계정 검색..."
+              placeholder="사이트명(아이디) 검색..."
             />
           </FieldRow>
           <div />

@@ -53,10 +53,10 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
 
   return (
     <div style={{ overflowX: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 1200 }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 1400 }}>
         <thead>
           <tr style={{ background: "#0b0e1a", borderBottom: `2px solid ${C.border}` }}>
-            {["", "소유자", "그룹", "구분", "세부구분", "사이트명", "아이디", "패스워드", "접속", "서비스", "액션"].map(h => (
+            {["", "소유자", "그룹", "플랫폼", "유형", "태그", "사이트명", "아이디", "패스워드", "접속", "서비스", "액션"].map(h => (
               <th key={h} style={{ padding: "10px 13px", textAlign: "left", color: C.muted, fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{h}</th>
             ))}
           </tr>
@@ -78,8 +78,9 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   </td>
                   <td style={tdSt}><span style={{ fontWeight: 700, color: "#fff" }}>{a.owner || "—"}</span></td>
                   <td style={tdSt}>{a.group ? <Tag text={a.group} color={groupColors[a.group] || C.muted} /> : "—"}</td>
-                  <td style={tdSt}>{a.category ? <Tag text={a.category} color={C.accent} /> : "—"}</td>
-                  <td style={tdSt}>{a.subcategory ? <Tag text={a.subcategory} color={C.blue} /> : "—"}</td>
+                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.platforms || []).length > 0 ? (a.platforms || []).map(t => <Tag key={t} text={t} color={C.accent} />) : "—"}</div></td>
+                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.types || []).length > 0 ? (a.types || []).map(t => <Tag key={t} text={t} color={C.blue} />) : "—"}</div></td>
+                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.tags || []).length > 0 ? (a.tags || []).map(t => <Tag key={t} text={t} color={C.green} />) : "—"}</div></td>
                   <td style={tdSt}>
                     <span style={{ color: C.text, fontSize: 13 }}>{a.siteName || "—"}</span>
                   </td>
@@ -117,7 +118,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                 </tr>
                 {isOpen && (
                   <tr key={a.id + "_detail"} style={{ background: "#080b15" }}>
-                    <td colSpan={11} style={{ padding: 0 }}>
+                    <td colSpan={12} style={{ padding: 0 }}>
                       <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}` }}>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: "12px 20px", marginBottom: 14 }}>
                           {[
@@ -164,7 +165,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
             );
           })}
           {accounts.length === 0 && (
-            <tr><td colSpan={11} style={{ textAlign: "center", padding: 60, color: C.muted }}>계정이 없습니다.</td></tr>
+            <tr><td colSpan={12} style={{ textAlign: "center", padding: 60, color: C.muted }}>계정이 없습니다.</td></tr>
           )}
         </tbody>
       </table>

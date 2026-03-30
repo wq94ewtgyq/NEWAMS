@@ -12,15 +12,17 @@ export async function loadData() {
     services: data.services || [],
     owners: data.owners || [],
     groups: data.groups || [],
-    categories: data.categories || [],
+    platformOptions: data.platformOptions || [],
+    typeOptions: data.typeOptions || [],
+    tagOptions: data.tagOptions || [],
   };
 }
 
-export async function saveAllData({ accounts, services, owners, groups, categories }) {
+export async function saveAllData({ accounts, services, owners, groups, platformOptions, typeOptions, tagOptions }) {
   const res = await fetch(`${API}/data`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ accounts, services, owners, groups, categories }),
+    body: JSON.stringify({ accounts, services, owners, groups, platformOptions, typeOptions, tagOptions }),
   });
   if (res.status === 503) throw new Error("다른 사용자가 저장 중입니다. 잠시 후 다시 시도하세요.");
   if (!res.ok) throw new Error("저장 실패");
@@ -80,7 +82,7 @@ export const AUTH_METHODS = ["없음", "휴대폰문자", "휴대폰OTP", "이�
 // 폼 초기값
 // ─────────────────────────────────────────────────────
 export const emptyAccount = {
-  owner: "", group: "", category: "", subcategory: "", accessType: "사이트",
+  owner: "", group: "", platforms: [], types: [], tags: [], accessType: "사이트",
   siteName: "", url: "", loginMethod: "일반", linkedAccount: "",
   username: "", password: "",
   authInfos: [{ method: "없음", contact: "" }],

@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import * as XLSX from "xlsx";
 import { C, inputSt, groupColors, loadData, saveAllData, calcExpiry, daysLeft, uid, emptyAccount, emptyService } from "./constants.js";
-import { Btn, Modal, ModalHeader, ModalFooter, FilterSel, Toast, Spinner, AccountForm, ServiceForm, ManageListModal, ManageCategoryModal } from "./components.jsx";
+import { Btn, Modal, ModalHeader, ModalFooter, FilterSel, Toast, Spinner, AccountForm, ServiceForm, ManageListModal } from "./components.jsx";
 import { AccountsTab, ServicesTab } from "./tabs.jsx";
 
 // ─────────────────────────────────────────────────────
@@ -26,7 +26,9 @@ export default function App() {
   const [services, setServices] = useState([]);
   const [owners, setOwners] = useState([]);
   const [groups, setGroups] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [platformOptions, setPlatformOptions] = useState([]);
+  const [typeOptions, setTypeOptions] = useState([]);
+  const [tagOptions, setTagOptions] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [saving, setSaving]     = useState(false);
   const [toast, setToast]       = useState(null);
@@ -46,9 +48,14 @@ export default function App() {
   const [delConfirm, setDelConfirm] = useState(null);
   const [endConfirm, setEndConfirm] = useState(null);
 
-  const [manageOwners, setManageOwners]       = useState(false);
-  const [manageGroups, setManageGroups]        = useState(false);
-  const [manageCategories, setManageCategories] = useState(false);
+  const [manageOwners, setManageOwners]         = useState(false);
+  const [manageGroups, setManageGroups]          = useState(false);
+  const [managePlatforms, setManagePlatforms]    = useState(false);
+  const [manageTypes, setManageTypes]            = useState(false);
+  const [manageTags, setManageTags]              = useState(false);
+  const [filterPlatform, setFilterPlatform]      = useState("전체");
+  const [filterType, setFilterType]              = useState("전체");
+  const [filterTag, setFilterTag]                = useState("전체");
 
   const fileInputRef = useRef(null);
 
@@ -59,7 +66,9 @@ export default function App() {
         setServices(data.services || []);
         setOwners(data.owners || []);
         setGroups(data.groups || []);
-        setCategories(data.categories || []);
+        setPlatformOptions(data.platformOptions || []);
+        setTypeOptions(data.typeOptions || []);
+        setTagOptions(data.tagOptions || []);
       })
       .catch(() => showToast("데이터를 불러오지 못했습니다.", "error"))
       .finally(() => setLoading(false));
@@ -69,15 +78,17 @@ export default function App() {
     setToast({ message, type });
   }, []);
 
-  const persist = useCallback(async (newAccounts, newServices, newOwners, newGroups, newCategories) => {
+  const persist = useCallback(async (newAccounts, newServices, opts = {}) => {
     setSaving(true);
     try {
       await saveAllData({
         accounts: newAccounts ?? accounts,
         services: newServices ?? services,
-        owners: newOwners ?? owners,
-        groups: newGroups ?? groups,
-        categories: newCategories ?? categories,
+        owners: opts.owners ?? owners,
+        groups: opts.groups ?? groups,
+        platformOptions: opts.platformOptions ?? platformOptions,
+        typeOptions: opts.typeOptions ?? typeOptions,
+        tagOptions: opts.tagOptions ?? tagOptions,
       });
       showToast("저장되었습니다.");
     } catch (e) {
@@ -85,18 +96,25 @@ export default function App() {
     } finally {
       setSaving(false);
     }
-  }, [showToast, accounts, services, owners, groups, categories]);
+  }, [showToast, accounts, services, owners, groups, platformOptions, typeOptions, tagOptions]);
 
   const ownerOptions = useMemo(() => ["전체", ...new Set(accounts.map(a => a.owner).filter(Boolean))], [accounts]);
   const groupOptions = useMemo(() => ["전체", ...new Set(accounts.map(a => a.group).filter(Boolean))], [accounts]);
+
+  const allPlatforms = useMemo(() => ["전체", ...new Set(accounts.flatMap(a => a.platforms || []))], [accounts]);
+  const allTypes = useMemo(() => ["전체", ...new Set(accounts.flatMap(a => a.types || []))], [accounts]);
+  const allTags = useMemo(() => ["전체", ...new Set(accounts.flatMap(a => a.tags || []))], [accounts]);
 
   const filteredAccounts = useMemo(() => accounts.filter(a => {
     const q1 = search1.toLowerCase();
     const q2 = search2.toLowerCase();
     const matchOwner = filterOwner === "전체" || a.owner === filterOwner;
     const matchGroup = filterGroup === "전체" || a.group === filterGroup;
+    const matchPlatform = filterPlatform === "전체" || (a.platforms || []).includes(filterPlatform);
+    const matchType = filterType === "전체" || (a.types || []).includes(filterType);
+    const matchTag = filterTag === "전체" || (a.tags || []).includes(filterTag);
     const vals = Object.values(a).map(v => {
-      if (Array.isArray(v)) return v.map(x => Object.values(x).join(" ")).join(" ");
+      if (Array.isArray(v)) return v.map(x => typeof x === "object" ? Object.values(x).join(" ") : String(x)).join(" ");
       return String(v);
     }).join(" ").toLowerCase();
     const matchQ1 = !q1 || vals.includes(q1);
@@ -109,8 +127,8 @@ export default function App() {
       matchService = !services.some(s => s.accountId === a.id && s.status === "active");
     }
 
-    return matchOwner && matchGroup && matchQ1 && matchQ2 && matchService;
-  }), [accounts, search1, search2, filterOwner, filterGroup, filterService, services]);
+    return matchOwner && matchGroup && matchPlatform && matchType && matchTag && matchQ1 && matchQ2 && matchService;
+  }), [accounts, search1, search2, filterOwner, filterGroup, filterPlatform, filterType, filterTag, filterService, services]);
 
   const filteredServices = useMemo(() => {
     const accIds = new Set(filteredAccounts.map(a => a.id));
@@ -142,14 +160,14 @@ export default function App() {
       ? [...accounts, { ...accForm, id: uid() }]
       : accounts.map(a => a.id === accModal.id ? { ...accForm, id: a.id } : a);
     setAccounts(next); setAccModal(null);
-    await persist(next, services, owners, groups, categories);
+    await persist(next, services);
   };
 
   const deleteAcc = async id => {
     const nextAcc = accounts.filter(a => a.id !== id);
     const nextSvc = services.filter(s => s.accountId !== id);
     setAccounts(nextAcc); setServices(nextSvc); setDelConfirm(null);
-    await persist(nextAcc, nextSvc, owners, groups, categories);
+    await persist(nextAcc, nextSvc);
   };
 
   // ── 서비스 CRUD ──
@@ -173,20 +191,22 @@ export default function App() {
       next = [...services, { ...svcForm, id: uid(), status: "active", renewedFromId: svcModal.renewedFromId }];
     }
     setServices(next); setSvcModal(null);
-    await persist(accounts, next, owners, groups, categories);
+    await persist(accounts, next);
   };
 
-  const deleteSvc  = async id => { const next = services.filter(s => s.id !== id); setServices(next); setDelConfirm(null); await persist(accounts, next, owners, groups, categories); };
-  const endService = async id => { const next = services.map(s => s.id === id ? { ...s, status: "ended" } : s); setServices(next); setEndConfirm(null); await persist(accounts, next, owners, groups, categories); };
-  const reactivate = async id => { const next = services.map(s => s.id === id ? { ...s, status: "active" } : s); setServices(next); await persist(accounts, next, owners, groups, categories); };
+  const deleteSvc  = async id => { const next = services.filter(s => s.id !== id); setServices(next); setDelConfirm(null); await persist(accounts, next); };
+  const endService = async id => { const next = services.map(s => s.id === id ? { ...s, status: "ended" } : s); setServices(next); setEndConfirm(null); await persist(accounts, next); };
+  const reactivate = async id => { const next = services.map(s => s.id === id ? { ...s, status: "active" } : s); setServices(next); await persist(accounts, next); };
 
   const svcByAcc = accId => services.filter(s => s.accountId === accId && (showEnded ? true : s.status === "active"));
   const svcModalTitle = svcModal?.mode === "add" ? "서비스 추가" : svcModal?.mode === "edit" ? "서비스 수정" : "서비스 갱신";
 
   // ── 관리 모달 저장 ──
-  const saveOwners = async (list) => { setOwners(list); await persist(accounts, services, list, groups, categories); };
-  const saveGroups = async (list) => { setGroups(list); await persist(accounts, services, owners, list, categories); };
-  const saveCats   = async (list) => { setCategories(list); await persist(accounts, services, owners, groups, list); };
+  const saveOwners = async (list) => { setOwners(list); await persist(accounts, services, { owners: list }); };
+  const saveGroups = async (list) => { setGroups(list); await persist(accounts, services, { groups: list }); };
+  const savePlatformOpts = async (list) => { setPlatformOptions(list); await persist(accounts, services, { platformOptions: list }); };
+  const saveTypeOpts = async (list) => { setTypeOptions(list); await persist(accounts, services, { typeOptions: list }); };
+  const saveTagOpts = async (list) => { setTagOptions(list); await persist(accounts, services, { tagOptions: list }); };
 
   // ── 엑셀 내보내기 ──
   const exportExcel = () => {
@@ -198,8 +218,9 @@ export default function App() {
       return {
         "계정소유자": a.owner,
         "그룹": a.group,
-        "구분": a.category || "",
-        "세부구분": a.subcategory || "",
+        "플랫폼": (a.platforms || []).join(", "),
+        "유형": (a.types || []).join(", "),
+        "태그": (a.tags || []).join(", "),
         "접속구분": a.accessType,
         "사이트명": a.siteName || "",
         "URL": a.url,
@@ -246,11 +267,13 @@ export default function App() {
             return { method: method || "없음", contact: contact || "" };
           }) : [{ method: "없음", contact: "" }];
 
+          const parseTags = str => String(str || "").split(",").map(s => s.trim()).filter(Boolean);
           const accData = {
             owner: String(row["계정소유자"] || ""),
             group: String(row["그룹"] || ""),
-            category: String(row["구분"] || ""),
-            subcategory: String(row["세부구분"] || ""),
+            platforms: parseTags(row["플랫폼"]),
+            types: parseTags(row["유형"]),
+            tags: parseTags(row["태그"]),
             accessType: String(row["접속구분"] || "사이트"),
             siteName: String(row["사이트명"] || ""),
             url: url,
@@ -272,7 +295,7 @@ export default function App() {
         }
 
         setAccounts(newAccounts);
-        await persist(newAccounts, services, owners, groups, categories);
+        await persist(newAccounts, services);
         showToast(`엑셀 가져오기 완료: ${addCount}건 추가, ${updateCount}건 수정`);
       } catch (err) {
         showToast("엑셀 파일 처리 중 오류가 발생했습니다.", "error");
@@ -331,6 +354,9 @@ export default function App() {
         <input placeholder="검색 2..." value={search2} onChange={e => setSearch2(e.target.value)} style={{ ...inputSt, width: 180, background: C.bg, padding: "7px 12px" }} />
         <FilterSel label="소유자" value={filterOwner} options={ownerOptions} onChange={setFilterOwner} />
         <FilterSel label="그룹"   value={filterGroup}  options={groupOptions}  onChange={setFilterGroup} />
+        <FilterSel label="플랫폼" value={filterPlatform} options={allPlatforms} onChange={setFilterPlatform} />
+        <FilterSel label="유형"   value={filterType}     options={allTypes}     onChange={setFilterType} />
+        <FilterSel label="태그"   value={filterTag}      options={allTags}      onChange={setFilterTag} />
         <FilterSel label="서비스" value={filterService} options={["전체", "Y", "N"]} onChange={setFilterService} />
         <div style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", marginLeft: 8 }} onClick={() => setShowEnded(s => !s)}>
           <div style={{ width: 36, height: 20, borderRadius: 10, position: "relative", background: showEnded ? C.warn + "88" : "#1e2540", border: `1px solid ${showEnded ? C.warn : C.border2}`, transition: "background 0.2s" }}>
@@ -360,10 +386,14 @@ export default function App() {
       <Modal open={!!accModal} onClose={() => !saving && setAccModal(null)} wide>
         <ModalHeader title={accModal?.mode === "add" ? "계정 추가" : "계정 수정"} onClose={() => setAccModal(null)} />
         <AccountForm form={accForm} setForm={setAccForm}
-          owners={owners} groups={groups} categories={categories} accounts={accounts}
+          owners={owners} groups={groups}
+          platformOptions={platformOptions} typeOptions={typeOptions} tagOptions={tagOptions}
+          accounts={accounts}
           onManageOwners={() => setManageOwners(true)}
           onManageGroups={() => setManageGroups(true)}
-          onManageCategories={() => setManageCategories(true)}
+          onManagePlatforms={() => setManagePlatforms(true)}
+          onManageTypes={() => setManageTypes(true)}
+          onManageTags={() => setManageTags(true)}
         />
         <ModalFooter onCancel={() => setAccModal(null)} onSave={saveAcc} saving={saving} />
       </Modal>
@@ -423,9 +453,17 @@ export default function App() {
       <ManageListModal open={manageGroups} onClose={() => setManageGroups(false)}
         title="그룹 관리" items={groups} onSave={saveGroups} />
 
-      {/* 카테고리 관리 */}
-      <ManageCategoryModal open={manageCategories} onClose={() => setManageCategories(false)}
-        categories={categories} onSave={saveCats} />
+      {/* 플랫폼 관리 */}
+      <ManageListModal open={managePlatforms} onClose={() => setManagePlatforms(false)}
+        title="플랫폼 관리" items={platformOptions} onSave={savePlatformOpts} />
+
+      {/* 유형 관리 */}
+      <ManageListModal open={manageTypes} onClose={() => setManageTypes(false)}
+        title="유형 관리" items={typeOptions} onSave={saveTypeOpts} />
+
+      {/* 태그 관리 */}
+      <ManageListModal open={manageTags} onClose={() => setManageTags(false)}
+        title="태그 관리" items={tagOptions} onSave={saveTagOpts} />
     </div>
   );
 }
