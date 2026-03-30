@@ -464,7 +464,7 @@ export function Spinner() {
 // ─────────────────────────────────────────────────────
 // 계정 폼
 // ─────────────────────────────────────────────────────
-export function AccountForm({ form, setForm, owners, groups, platformOptions, typeOptions, tagOptions, accounts, onManageOwners, onManageGroups, onManagePlatforms, onManageTypes, onManageTags }) {
+export function AccountForm({ form, setForm, owners, groups, typeOptions, tagOptions, accounts, onManageOwners, onManageGroups, onManageTypes, onManageTags }) {
   const f = k => v => setForm(p => ({ ...p, [k]: v }));
 
   const linkedOptions = accounts
@@ -487,10 +487,7 @@ export function AccountForm({ form, setForm, owners, groups, platformOptions, ty
             <SearchableDropdown value={form.group} onChange={f("group")} options={groups} onManage={onManageGroups} placeholder="그룹 검색..." />
           </FieldRow>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px 16px", marginTop: 10 }}>
-          <FieldRow label="플랫폼">
-            <MultiTagInput selected={form.platforms || []} onChange={f("platforms")} options={platformOptions} onManage={onManagePlatforms} placeholder="플랫폼 검색..." color="#e07c24" />
-          </FieldRow>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 16px", marginTop: 10 }}>
           <FieldRow label="유형">
             <MultiTagInput selected={form.types || []} onChange={f("types")} options={typeOptions} onManage={onManageTypes} placeholder="유형 검색..." color={C.blue} />
           </FieldRow>

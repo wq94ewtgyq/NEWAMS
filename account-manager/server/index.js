@@ -14,7 +14,7 @@ const DB_PATH = path.join(__dirname, '../data/db.json');
 function ensureDb() {
   if (!fs.existsSync(DB_PATH)) {
     fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-    fs.writeFileSync(DB_PATH, JSON.stringify({ accounts: [], services: [], owners: [], groups: [], platformOptions: [], typeOptions: [], tagOptions: [] }, null, 2));
+    fs.writeFileSync(DB_PATH, JSON.stringify({ accounts: [], services: [], owners: [], groups: [], typeOptions: [], tagOptions: [] }, null, 2));
   }
 }
 

@@ -26,7 +26,6 @@ export default function App() {
   const [services, setServices] = useState([]);
   const [owners, setOwners] = useState([]);
   const [groups, setGroups] = useState([]);
-  const [platformOptions, setPlatformOptions] = useState([]);
   const [typeOptions, setTypeOptions] = useState([]);
   const [tagOptions, setTagOptions] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -38,11 +37,11 @@ export default function App() {
   const [search2, setSearch2]             = useState("");
   const [filterOwner, setFilterOwner]     = useState("전체");
   const [filterGroups, setFilterGroups]       = useState([]);
-  const [filterPlatforms, setFilterPlatforms]  = useState([]);
   const [filterTypes, setFilterTypes]          = useState([]);
   const [filterTags, setFilterTags]            = useState([]);
   const [filterService, setFilterService] = useState("전체");
   const [showEnded, setShowEnded]         = useState(false);
+  const [showInactive, setShowInactive]   = useState(false);
 
   const [accModal, setAccModal]     = useState(null);
   const [accForm, setAccForm]       = useState(emptyAccount);
@@ -53,7 +52,6 @@ export default function App() {
 
   const [manageOwners, setManageOwners]         = useState(false);
   const [manageGroups, setManageGroups]          = useState(false);
-  const [managePlatforms, setManagePlatforms]    = useState(false);
   const [manageTypes, setManageTypes]            = useState(false);
   const [manageTags, setManageTags]              = useState(false);
   const [showTrash, setShowTrash]                = useState(false);
@@ -67,7 +65,6 @@ export default function App() {
         setServices(data.services || []);
         setOwners(data.owners || []);
         setGroups(data.groups || []);
-        setPlatformOptions(data.platformOptions || []);
         setTypeOptions(data.typeOptions || []);
         setTagOptions(data.tagOptions || []);
       })
@@ -87,7 +84,6 @@ export default function App() {
         services: newServices ?? services,
         owners: opts.owners ?? owners,
         groups: opts.groups ?? groups,
-        platformOptions: opts.platformOptions ?? platformOptions,
         typeOptions: opts.typeOptions ?? typeOptions,
         tagOptions: opts.tagOptions ?? tagOptions,
       });
@@ -97,23 +93,26 @@ export default function App() {
     } finally {
       setSaving(false);
     }
-  }, [showToast, accounts, services, owners, groups, platformOptions, typeOptions, tagOptions]);
+  }, [showToast, accounts, services, owners, groups, typeOptions, tagOptions]);
 
   const ownerOptions = useMemo(() => ["전체", ...new Set(accounts.map(a => a.owner).filter(Boolean))], [accounts]);
   const groupOptions = useMemo(() => [...new Set(accounts.map(a => a.group).filter(Boolean))], [accounts]);
-  const allPlatforms = useMemo(() => [...new Set(accounts.flatMap(a => a.platforms || []))], [accounts]);
   const allTypes = useMemo(() => [...new Set(accounts.flatMap(a => a.types || []))], [accounts]);
   const allTags = useMemo(() => [...new Set(accounts.flatMap(a => a.tags || []))], [accounts]);
 
-  const activeAccounts = useMemo(() => accounts.filter(a => a.status !== "deleted"), [accounts]);
+  const visibleAccounts = useMemo(() => accounts.filter(a => {
+    if (a.status === "deleted") return false;
+    if (!showInactive && a.status === "inactive") return false;
+    return true;
+  }), [accounts, showInactive]);
   const deletedAccounts = useMemo(() => accounts.filter(a => a.status === "deleted"), [accounts]);
+  const inactiveCount = useMemo(() => accounts.filter(a => a.status === "inactive").length, [accounts]);
 
-  const filteredAccounts = useMemo(() => activeAccounts.filter(a => {
+  const filteredAccounts = useMemo(() => visibleAccounts.filter(a => {
     const q1 = search1.toLowerCase();
     const q2 = search2.toLowerCase();
     const matchOwner = filterOwner === "전체" || a.owner === filterOwner;
     const matchGroup = filterGroups.length === 0 || filterGroups.includes(a.group);
-    const matchPlatform = filterPlatforms.length === 0 || (a.platforms || []).some(p => filterPlatforms.includes(p));
     const matchType = filterTypes.length === 0 || (a.types || []).some(t => filterTypes.includes(t));
     const matchTag = filterTags.length === 0 || (a.tags || []).some(t => filterTags.includes(t));
     const vals = Object.values(a).map(v => {
@@ -130,8 +129,8 @@ export default function App() {
       matchService = !services.some(s => s.accountId === a.id && s.status === "active");
     }
 
-    return matchOwner && matchGroup && matchPlatform && matchType && matchTag && matchQ1 && matchQ2 && matchService;
-  }), [activeAccounts, search1, search2, filterOwner, filterGroups, filterPlatforms, filterTypes, filterTags, filterService, services]);
+    return matchOwner && matchGroup && matchType && matchTag && matchQ1 && matchQ2 && matchService;
+  }), [visibleAccounts, search1, search2, filterOwner, filterGroups, filterTypes, filterTags, filterService, services]);
 
   const filteredServices = useMemo(() => {
     const accIds = new Set(filteredAccounts.map(a => a.id));
@@ -159,7 +158,6 @@ export default function App() {
   const openEditAcc = a  => {
     setAccForm({
       ...a,
-      platforms: a.platforms || [],
       types: a.types || [],
       tags: a.tags || [],
       authInfos: a.authInfos || [{ method: "없음", contact: "" }],
@@ -187,6 +185,20 @@ export default function App() {
     setAccounts(nextAcc);
     await persist(nextAcc, services);
     showToast("계정이 복구되었습니다.");
+  };
+
+  const deactivateAcc = async id => {
+    const nextAcc = accounts.map(a => a.id === id ? { ...a, status: "inactive" } : a);
+    setAccounts(nextAcc);
+    await persist(nextAcc, services);
+    showToast("계정이 비활성 처리되었습니다.");
+  };
+
+  const activateAcc = async id => {
+    const nextAcc = accounts.map(a => a.id === id ? { ...a, status: "active" } : a);
+    setAccounts(nextAcc);
+    await persist(nextAcc, services);
+    showToast("계정이 활성화되었습니다.");
   };
 
   const permanentDeleteAcc = async id => {
@@ -231,7 +243,6 @@ export default function App() {
   // ── 관리 모달 저장 ──
   const saveOwners = async (list) => { setOwners(list); await persist(accounts, services, { owners: list }); };
   const saveGroups = async (list) => { setGroups(list); await persist(accounts, services, { groups: list }); };
-  const savePlatformOpts = async (list) => { setPlatformOptions(list); await persist(accounts, services, { platformOptions: list }); };
   const saveTypeOpts = async (list) => { setTypeOptions(list); await persist(accounts, services, { typeOptions: list }); };
   const saveTagOpts = async (list) => { setTagOptions(list); await persist(accounts, services, { tagOptions: list }); };
 
@@ -248,7 +259,6 @@ export default function App() {
       return {
         "계정소유자": a.owner,
         "그룹": a.group,
-        "플랫폼": (a.platforms || []).join(","),
         "유형": (a.types || []).join(","),
         "태그": (a.tags || []).join(","),
         "사이트명": a.siteName || "",
@@ -286,7 +296,6 @@ export default function App() {
 
         const newOwners = new Set(owners);
         const newGroups = new Set(groups);
-        const newPlatforms = new Set(platformOptions);
         const newTypes = new Set(typeOptions);
         const newTags = new Set(tagOptions);
 
@@ -312,11 +321,9 @@ export default function App() {
             return info;
           }) : [{ method: "없음" }];
 
-          const rowPlatforms = parseTags(row["플랫폼"]);
           const rowTypes = parseTags(row["유형"]);
           const rowTags = parseTags(row["태그"]);
 
-          rowPlatforms.forEach(v => newPlatforms.add(v));
           rowTypes.forEach(v => newTypes.add(v));
           rowTags.forEach(v => newTags.add(v));
 
@@ -328,7 +335,6 @@ export default function App() {
           const accData = {
             owner: rowOwner,
             group: rowGroup,
-            platforms: rowPlatforms,
             types: rowTypes,
             tags: rowTags,
             siteName: String(row["사이트명"] || ""),
@@ -351,20 +357,17 @@ export default function App() {
 
         const updatedOwners = [...newOwners];
         const updatedGroups = [...newGroups];
-        const updatedPlatforms = [...newPlatforms];
         const updatedTypes = [...newTypes];
         const updatedTags = [...newTags];
 
         setAccounts(newAccounts);
         setOwners(updatedOwners);
         setGroups(updatedGroups);
-        setPlatformOptions(updatedPlatforms);
         setTypeOptions(updatedTypes);
         setTagOptions(updatedTags);
         await persist(newAccounts, services, {
           owners: updatedOwners,
           groups: updatedGroups,
-          platformOptions: updatedPlatforms,
           typeOptions: updatedTypes,
           tagOptions: updatedTags,
         });
@@ -438,11 +441,20 @@ export default function App() {
             </div>
             <span style={{ fontSize: 12, color: C.muted, userSelect: "none" }}>이용종료 포함 {endedCount > 0 && `(${endedCount})`}</span>
           </div>
+          <button onClick={() => setShowInactive(s => !s)}
+            style={{
+              background: showInactive ? C.muted + "25" : "transparent",
+              color: showInactive ? C.text : C.muted,
+              border: `1px solid ${showInactive ? C.muted + "60" : C.border2}`,
+              borderRadius: 5, padding: "4px 12px", fontSize: 11, fontWeight: 600,
+              cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s",
+            }}>
+            비활성 포함 {inactiveCount > 0 && `(${inactiveCount})`}
+          </button>
           <span style={{ fontSize: 11, color: C.muted, marginLeft: "auto" }}>{tab === "accounts" ? `${filteredAccounts.length}개` : `${filteredServices.length}개`} 표시</span>
         </div>
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
           <ButtonFilter label="그룹" options={groupOptions} selected={filterGroups} onChange={setFilterGroups} color="#a78bfa" />
-          <ButtonFilter label="플랫폼" options={allPlatforms} selected={filterPlatforms} onChange={setFilterPlatforms} color="#e07c24" />
           <ButtonFilter label="유형" options={allTypes} selected={filterTypes} onChange={setFilterTypes} color={C.blue} />
           <ButtonFilter label="태그" options={allTags} selected={filterTags} onChange={setFilterTags} color={C.green} />
         </div>
@@ -453,6 +465,7 @@ export default function App() {
         {tab === "accounts" ? (
           <AccountsTab accounts={filteredAccounts} services={services} allAccounts={accounts} svcByAcc={svcByAcc} onEdit={openEditAcc}
             onDelete={r => setDelConfirm({ type: "account", id: r.id, label: `${r.owner}의 ${r.username}` })}
+            onDeactivate={deactivateAcc} onActivate={activateAcc}
             onAddService={openAddSvc} onEditSvc={openEditSvc} onRenewSvc={openRenewSvc}
             onEndSvc={s => setEndConfirm(s)} onReactivate={reactivate}
             onDeleteSvc={s => setDelConfirm({ type: "service", id: s.id, label: s.name })} />
@@ -468,11 +481,10 @@ export default function App() {
         <ModalHeader title={accModal?.mode === "add" ? "계정 추가" : "계정 수정"} onClose={() => setAccModal(null)} />
         <AccountForm form={accForm} setForm={setAccForm}
           owners={owners} groups={groups}
-          platformOptions={platformOptions} typeOptions={typeOptions} tagOptions={tagOptions}
+          typeOptions={typeOptions} tagOptions={tagOptions}
           accounts={accounts}
           onManageOwners={() => setManageOwners(true)}
           onManageGroups={() => setManageGroups(true)}
-          onManagePlatforms={() => setManagePlatforms(true)}
           onManageTypes={() => setManageTypes(true)}
           onManageTags={() => setManageTags(true)}
         />
@@ -533,10 +545,6 @@ export default function App() {
       {/* 그룹 관리 */}
       <ManageListModal open={manageGroups} onClose={() => setManageGroups(false)}
         title="그룹 관리" items={groups} onSave={saveGroups} />
-
-      {/* 플랫폼 관리 */}
-      <ManageListModal open={managePlatforms} onClose={() => setManagePlatforms(false)}
-        title="플랫폼 관리" items={platformOptions} onSave={savePlatformOpts} />
 
       {/* 유형 관리 */}
       <ManageListModal open={manageTypes} onClose={() => setManageTypes(false)}

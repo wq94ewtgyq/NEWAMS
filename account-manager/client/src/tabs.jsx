@@ -40,7 +40,7 @@ export function ServiceRow({ s, onEdit, onRenew, onEnd, onReactivate, onDelete }
 // ─────────────────────────────────────────────────────
 // 계정 탭 — 관리형 테이블 UI
 // ─────────────────────────────────────────────────────
-export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, onAddService, onEditSvc, onRenewSvc, onEndSvc, onReactivate, onDeleteSvc, allAccounts }) {
+export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, onDeactivate, onActivate, onAddService, onEditSvc, onRenewSvc, onEndSvc, onReactivate, onDeleteSvc, allAccounts }) {
   const [expanded, setExpanded] = useState({});
   const toggle = id => setExpanded(p => ({ ...p, [id]: !p[id] }));
 
@@ -56,7 +56,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 1400 }}>
         <thead>
           <tr style={{ background: "#0b0e1a", borderBottom: `2px solid ${C.border}` }}>
-            {["", "소유자", "그룹", "플랫폼", "유형", "태그", "사이트명", "아이디", "패스워드", "접속", "서비스", "액션"].map(h => (
+            {["", "소유자", "그룹", "유형", "태그", "사이트명", "아이디", "패스워드", "접속", "서비스", "액션"].map(h => (
               <th key={h} style={{ padding: "10px 13px", textAlign: "left", color: C.muted, fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{h}</th>
             ))}
           </tr>
@@ -67,18 +67,21 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
             const isOpen = expanded[a.id];
             const rowBg = i % 2 === 0 ? C.bg : "#0c0f1c";
             const activeCount = svcs.filter(s => s.status === "active").length;
+            const isInactive = a.status === "inactive";
             return (
               <>
-                <tr key={a.id} style={{ background: rowBg, borderBottom: `1px solid ${C.border}`, cursor: "pointer" }}
+                <tr key={a.id} style={{ background: rowBg, borderBottom: `1px solid ${C.border}`, cursor: "pointer", opacity: isInactive ? 0.5 : 1 }}
                   onClick={() => toggle(a.id)}
                   onMouseEnter={e => e.currentTarget.style.background = "#141c2e"}
                   onMouseLeave={e => e.currentTarget.style.background = rowBg}>
                   <td style={tdSt}>
-                    <span style={{ color: C.muted, fontSize: 16 }}>{isOpen ? "▾" : "▸"}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ color: C.muted, fontSize: 16 }}>{isOpen ? "▾" : "▸"}</span>
+                      {isInactive && <Tag text="비활성" color={C.muted} />}
+                    </div>
                   </td>
-                  <td style={tdSt}><span style={{ fontWeight: 700, color: "#fff" }}>{a.owner || "—"}</span></td>
+                  <td style={tdSt}><span style={{ fontWeight: 700, color: isInactive ? C.muted : "#fff" }}>{a.owner || "—"}</span></td>
                   <td style={tdSt}>{a.group ? <Tag text={a.group} color={groupColors[a.group] || C.muted} /> : "—"}</td>
-                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.platforms || []).length > 0 ? (a.platforms || []).map(t => <Tag key={t} text={t} color="#e07c24" />) : "—"}</div></td>
                   <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.types || []).length > 0 ? (a.types || []).map(t => <Tag key={t} text={t} color={C.blue} />) : "—"}</div></td>
                   <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.tags || []).length > 0 ? (a.tags || []).map(t => <Tag key={t} text={t} color={C.green} />) : "—"}</div></td>
                   <td style={tdSt}>
@@ -110,15 +113,19 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   </td>
                   <td style={{ ...tdSt, whiteSpace: "nowrap" }} onClick={e => e.stopPropagation()}>
                     <div style={{ display: "flex", gap: 4 }}>
-                      <Btn small accent onClick={() => onAddService(a.id)}>+ 서비스</Btn>
+                      {!isInactive && <Btn small accent onClick={() => onAddService(a.id)}>+ 서비스</Btn>}
                       <Btn small blue onClick={() => onEdit(a)}>수정</Btn>
+                      {isInactive
+                        ? <Btn small green onClick={() => onActivate(a.id)}>활성화</Btn>
+                        : <Btn small ghost onClick={() => onDeactivate(a.id)}>비활성</Btn>
+                      }
                       <Btn small danger onClick={() => onDelete(a)}>삭제</Btn>
                     </div>
                   </td>
                 </tr>
                 {isOpen && (
                   <tr key={a.id + "_detail"} style={{ background: "#080b15" }}>
-                    <td colSpan={12} style={{ padding: 0 }}>
+                    <td colSpan={11} style={{ padding: 0 }}>
                       <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}` }}>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: "12px 20px", marginBottom: 14 }}>
                           {[
@@ -167,7 +174,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
             );
           })}
           {accounts.length === 0 && (
-            <tr><td colSpan={12} style={{ textAlign: "center", padding: 60, color: C.muted }}>계정이 없습니다.</td></tr>
+            <tr><td colSpan={11} style={{ textAlign: "center", padding: 60, color: C.muted }}>계정이 없습니다.</td></tr>
           )}
         </tbody>
       </table>
@@ -251,7 +258,7 @@ export function ServicesTab({ services, accounts, onEdit, onRenew, onEnd, onReac
                 </tr>
               );
             })}
-            {services.length === 0 && <tr><td colSpan={12} style={{ textAlign: "center", padding: 50, color: C.muted }}>서비스가 없습니다.</td></tr>}
+            {services.length === 0 && <tr><td colSpan={11} style={{ textAlign: "center", padding: 50, color: C.muted }}>서비스가 없습니다.</td></tr>}
           </tbody>
         </table>
       </div>

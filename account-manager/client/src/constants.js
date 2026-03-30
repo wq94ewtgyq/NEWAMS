@@ -12,17 +12,16 @@ export async function loadData() {
     services: data.services || [],
     owners: data.owners || [],
     groups: data.groups || [],
-    platformOptions: data.platformOptions || [],
     typeOptions: data.typeOptions || [],
     tagOptions: data.tagOptions || [],
   };
 }
 
-export async function saveAllData({ accounts, services, owners, groups, platformOptions, typeOptions, tagOptions }) {
+export async function saveAllData({ accounts, services, owners, groups, typeOptions, tagOptions }) {
   const res = await fetch(`${API}/data`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ accounts, services, owners, groups, platformOptions, typeOptions, tagOptions }),
+    body: JSON.stringify({ accounts, services, owners, groups, typeOptions, tagOptions }),
   });
   if (res.status === 503) throw new Error("다른 사용자가 저장 중입니다. 잠시 후 다시 시도하세요.");
   if (!res.ok) throw new Error("저장 실패");
@@ -97,7 +96,7 @@ export const AUTH_FIELDS = {
 // 폼 초기값
 // ─────────────────────────────────────────────────────
 export const emptyAccount = {
-  owner: "", group: "", platforms: [], types: [], tags: [],
+  owner: "", group: "", types: [], tags: [],
   siteName: "", url: "", linkedAccount: "",
   username: "", password: "",
   authInfos: [{ method: "없음", contact: "" }],
