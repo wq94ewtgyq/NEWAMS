@@ -59,9 +59,16 @@ export default function App() {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
+    const todayStr = new Date().toISOString().slice(0, 10);
     loadData()
       .then(data => {
-        setAccounts(data.accounts || []);
+        const accs = (data.accounts || []).map(a => {
+          if (a.lastVisited && a.lastVisited.slice(0, 10) !== todayStr) {
+            return { ...a, lastVisited: "" };
+          }
+          return a;
+        });
+        setAccounts(accs);
         setServices(data.services || []);
         setOwners(data.owners || []);
         setGroups(data.groups || []);
@@ -199,6 +206,20 @@ export default function App() {
     setAccounts(nextAcc);
     await persist(nextAcc, services);
     showToast("계정이 활성화되었습니다.");
+  };
+
+  const visitAccount = async id => {
+    const now = new Date().toISOString();
+    const nextAcc = accounts.map(a => a.id === id ? { ...a, lastVisited: now } : a);
+    setAccounts(nextAcc);
+    await persist(nextAcc, services);
+  };
+
+  const resetVisits = async () => {
+    const nextAcc = accounts.map(a => a.lastVisited ? { ...a, lastVisited: "" } : a);
+    setAccounts(nextAcc);
+    await persist(nextAcc, services);
+    showToast("접속 음영이 초기화되었습니다.");
   };
 
   const permanentDeleteAcc = async id => {
@@ -465,6 +486,8 @@ export default function App() {
         {tab === "accounts" ? (
           <AccountsTab accounts={filteredAccounts} services={services} allAccounts={accounts} svcByAcc={svcByAcc} onEdit={openEditAcc}
             onDelete={r => setDelConfirm({ type: "account", id: r.id, label: `${r.owner}의 ${r.username}` })}
+            onDeactivate={deactivateAcc} onActivate={activateAcc}
+            onVisit={visitAccount} onResetVisits={resetVisits}
             onAddService={openAddSvc} onEditSvc={openEditSvc} onRenewSvc={openRenewSvc}
             onEndSvc={s => setEndConfirm(s)} onReactivate={reactivate}
             onDeleteSvc={s => setDelConfirm({ type: "service", id: s.id, label: s.name })} />

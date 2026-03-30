@@ -40,17 +40,17 @@ export function ServiceRow({ s, onEdit, onRenew, onEnd, onReactivate, onDelete }
 // ─────────────────────────────────────────────────────
 // 계정 탭 — 관리형 테이블 UI
 // ─────────────────────────────────────────────────────
-export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, onDeactivate, onActivate, onAddService, onEditSvc, onRenewSvc, onEndSvc, onReactivate, onDeleteSvc, allAccounts }) {
+export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, onDeactivate, onActivate, onVisit, onResetVisits, onAddService, onEditSvc, onRenewSvc, onEndSvc, onReactivate, onDeleteSvc, allAccounts }) {
   const [expanded, setExpanded] = useState({});
-  const [visited, setVisited] = useState({});
   const toggle = id => setExpanded(p => ({ ...p, [id]: !p[id] }));
 
-  const handleVisit = (id) => {
-    setVisited(p => ({ ...p, [id]: new Date().toLocaleString("ko-KR") }));
+  const fmtVisit = (iso) => {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    return d.toLocaleString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
   };
-  const handleAction = (id) => {
-    setVisited(p => { const n = { ...p }; delete n[id]; return n; });
-  };
+
+  const hasAnyVisit = accounts.some(a => a.lastVisited);
 
   const getLinkedLabel = (linkedId) => {
     if (!linkedId) return "—";
@@ -61,6 +61,11 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
 
   return (
     <div style={{ overflowX: "auto" }}>
+      {hasAnyVisit && (
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+          <Btn small ghost onClick={onResetVisits}>접속음영 초기화</Btn>
+        </div>
+      )}
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 1200 }}>
         <thead>
           <tr style={{ background: "#0b0e1a", borderBottom: `2px solid ${C.border}` }}>
@@ -73,7 +78,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
           {accounts.map((a, i) => {
             const svcs = svcByAcc(a.id);
             const isOpen = expanded[a.id];
-            const isVisited = !!visited[a.id];
+            const isVisited = !!a.lastVisited;
             const rowBg = isVisited ? "#1a1510" : (i % 2 === 0 ? C.bg : "#0c0f1c");
             const activeCount = svcs.filter(s => s.status === "active").length;
             const isInactive = a.status === "inactive";
@@ -107,14 +112,14 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   <td style={tdSt} onClick={e => e.stopPropagation()}>
                     {a.url ? (
                       <a href={a.url.startsWith("http") ? a.url : `https://${a.url}`} target="_blank" rel="noreferrer"
-                        onClick={() => handleVisit(a.id)}
+                        onClick={() => onVisit(a.id)}
                         style={{ background: `linear-gradient(135deg,${C.brand},#ff4d4d)`, color: "#fff", borderRadius: 6, padding: "4px 12px", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
                         접속하기
                       </a>
                     ) : <span style={{ color: C.muted }}>—</span>}
                   </td>
                   <td style={tdSt}>
-                    <span style={{ fontSize: 11, color: visited[a.id] ? C.warn : C.muted }}>{visited[a.id] || "—"}</span>
+                    <span style={{ fontSize: 11, color: a.lastVisited ? C.warn : C.muted }}>{fmtVisit(a.lastVisited)}</span>
                   </td>
                   <td style={tdSt}>
                     {activeCount > 0 ? (
@@ -125,8 +130,12 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   </td>
                   <td style={{ ...tdSt, whiteSpace: "nowrap" }} onClick={e => e.stopPropagation()}>
                     <div style={{ display: "flex", gap: 4 }}>
-                      <Btn small blue onClick={() => { handleAction(a.id); onEdit(a); }}>수정</Btn>
-                      <Btn small danger onClick={() => { handleAction(a.id); onDelete(a); }}>삭제</Btn>
+                      <Btn small blue onClick={() => onEdit(a)}>수정</Btn>
+                      {isInactive ? (
+                        <><Btn small green onClick={() => onActivate(a.id)}>복구</Btn><Btn small danger onClick={() => onDelete(a)}>삭제</Btn></>
+                      ) : (
+                        <Btn small ghost onClick={() => onDeactivate(a.id)}>비활성</Btn>
+                      )}
                     </div>
                   </td>
                 </tr>
