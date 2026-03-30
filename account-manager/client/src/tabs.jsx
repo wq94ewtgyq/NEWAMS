@@ -98,13 +98,13 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
             const svcs = svcByAcc(a.id);
             const isOpen = expanded[a.id];
             const isVisited = !!a.visitHighlight;
-            const rowBg = isVisited ? "#2a2012" : (i % 2 === 0 ? C.rowEven : C.rowOdd);
+            const rowBg = isVisited ? "#172554" : (i % 2 === 0 ? C.rowEven : C.rowOdd);
             const activeCount = svcs.filter(s => s.status === "active").length;
             const isInactive = a.status === "inactive";
             const grpColor = groupColors[a.group] || C.sub;
             return (
               <>
-                <tr key={a.id} style={{ background: rowBg, borderBottom: `1px solid ${isVisited ? C.warn + "25" : C.border}`, cursor: "pointer", opacity: isInactive ? 0.45 : 1, borderLeft: `3px solid ${grpColor}40` }}
+                <tr key={a.id} style={{ background: rowBg, borderBottom: `1px solid ${isVisited ? C.blue + "30" : C.border}`, cursor: "pointer", opacity: isInactive ? 0.45 : 1, borderLeft: `3px solid ${grpColor}40` }}
                   onClick={() => toggle(a.id)}
                   onMouseEnter={e => e.currentTarget.style.background = C.rowHover}
                   onMouseLeave={e => e.currentTarget.style.background = rowBg}>
@@ -139,7 +139,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                     ) : <span style={{ color: C.sub }}>—</span>}
                   </td>
                   <td style={tdSt}>
-                    <span style={{ fontSize: 11, color: a.lastVisited ? C.warn : C.sub }}>{fmtVisit(a.lastVisited)}</span>
+                    <span style={{ fontSize: 11, color: a.lastVisited ? C.blue : C.sub }}>{fmtVisit(a.lastVisited)}</span>
                   </td>
                   <td style={tdSt}>
                     {activeCount > 0 ? (
