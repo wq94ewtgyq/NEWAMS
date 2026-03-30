@@ -154,7 +154,11 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                     {a.url ? (
                       <a href={a.url.startsWith("http") ? a.url : `https://${a.url}`} target="_blank" rel="noreferrer"
                         onClick={() => onVisit(a.id)}
-                        style={{ background: C.blue, color: "#fff", borderRadius: 6, padding: "4px 12px", fontSize: 11, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>
+                        onMouseEnter={e => { e.currentTarget.style.background = "#2563eb"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = C.blue; e.currentTarget.style.transform = "none"; }}
+                        onMouseDown={e => { e.currentTarget.style.transform = "scale(0.97)"; }}
+                        onMouseUp={e => { e.currentTarget.style.transform = "translateY(-1px)"; }}
+                        style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", height: 26, background: C.blue, color: "#fff", borderRadius: 5, padding: "0 12px", fontSize: 11, fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap", transition: "all 0.15s ease" }}>
                         접속
                       </a>
                     ) : <span style={{ color: C.sub }}>—</span>}
@@ -175,7 +179,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                       {isInactive ? (
                         <><Btn small green onClick={() => onActivate(a)}>복구</Btn><Btn small danger onClick={() => onDelete(a)}>삭제</Btn></>
                       ) : (
-                        <button onClick={() => onDeactivate(a)} style={{ background: "none", border: "none", color: C.sub, cursor: "pointer", fontSize: 11, padding: "4px 8px", opacity: 0.6 }}>비활성</button>
+                        <Btn small ghost onClick={() => onDeactivate(a)}>비활성</Btn>
                       )}
                     </div>
                   </td>

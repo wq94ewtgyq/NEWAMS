@@ -61,24 +61,32 @@ export function PwCell({ value }) {
   );
 }
 export function Btn({ children, onClick, small, accent, blue, danger, ghost, warn, disabled, green }) {
-  let bg, color, border;
-  if (danger)      { bg = C.danger + "22"; color = C.danger; border = `1px solid ${C.danger}44`; }
-  else if (blue)   { bg = C.blue + "22";   color = C.blue;   border = `1px solid ${C.blue}44`; }
-  else if (accent) { bg = C.accent + "22"; color = C.accent; border = `1px solid ${C.accent}44`; }
-  else if (green)  { bg = C.green + "22";  color = C.green;  border = `1px solid ${C.green}44`; }
-  else if (warn)   { bg = C.warn + "22";   color = C.warn;   border = `1px solid ${C.warn}44`; }
-  else if (ghost)  { bg = "transparent";   color = C.muted;  border = `1px solid ${C.border2}`; }
-  else             { bg = `linear-gradient(135deg,${C.accent},${C.blue})`; color = "#fff"; border = "none"; }
+  let bg, color, border, hoverBg;
+  if (danger)      { bg = C.danger + "18"; color = C.danger; border = `1px solid ${C.danger}35`; hoverBg = C.danger + "30"; }
+  else if (blue)   { bg = C.blue + "18";   color = C.blue;   border = `1px solid ${C.blue}35`;   hoverBg = C.blue + "30"; }
+  else if (accent) { bg = C.accent + "18"; color = C.accent; border = `1px solid ${C.accent}35`; hoverBg = C.accent + "30"; }
+  else if (green)  { bg = C.green + "18";  color = C.green;  border = `1px solid ${C.green}35`;  hoverBg = C.green + "30"; }
+  else if (warn)   { bg = C.warn + "18";   color = C.warn;   border = `1px solid ${C.warn}35`;   hoverBg = C.warn + "30"; }
+  else if (ghost)  { bg = "transparent";   color = C.muted;  border = `1px solid ${C.border}`;   hoverBg = C.border + "60"; }
+  else             { bg = C.blue;          color = "#fff";    border = "none";                    hoverBg = "#2563eb"; }
+  const h = small ? 26 : 34;
+  const rad = small ? 5 : 7;
+  const pad = small ? "0 10px" : "0 18px";
+  const fs = small ? 11 : 13;
   return (
-    <button onClick={onClick} disabled={disabled} style={{
-      background: bg, color, border, borderRadius: small ? 6 : 9,
-      padding: small ? "4px 10px" : "9px 22px",
-      cursor: disabled ? "not-allowed" : "pointer",
-      opacity: disabled ? 0.45 : 1,
-      fontSize: small ? 11 : 13, fontWeight: 700,
-      boxShadow: (!small && !ghost && !accent && !blue && !danger && !warn && !green) ? `0 4px 14px ${C.accent}40` : "none",
-      transition: "opacity 0.15s", whiteSpace: "nowrap",
-    }}>{children}</button>
+    <button onClick={onClick} disabled={disabled}
+      onMouseEnter={e => { if (!disabled) { e.currentTarget.style.background = hoverBg; e.currentTarget.style.transform = "translateY(-1px)"; } }}
+      onMouseLeave={e => { e.currentTarget.style.background = bg; e.currentTarget.style.transform = "none"; }}
+      onMouseDown={e => { if (!disabled) e.currentTarget.style.transform = "scale(0.97)"; }}
+      onMouseUp={e => { e.currentTarget.style.transform = "translateY(-1px)"; }}
+      style={{
+        background: bg, color, border, borderRadius: rad, height: h,
+        padding: pad, cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.4 : 1, fontSize: fs, fontWeight: 600,
+        transition: "all 0.15s ease", whiteSpace: "nowrap",
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        lineHeight: 1,
+      }}>{children}</button>
   );
 }
 export function Modal({ open, onClose, children, wide }) {
