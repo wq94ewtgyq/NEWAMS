@@ -37,6 +37,8 @@ export default function App() {
   const [filterService, setFilterService] = useState("전체");
   const [showEnded, setShowEnded]         = useState(false);
   const [showInactive, setShowInactive]   = useState(false);
+  const [sortKey, setSortKey]             = useState("");
+  const [sortDir, setSortDir]             = useState("asc");
 
   const [accModal, setAccModal]     = useState(null);
   const [accForm, setAccForm]       = useState(emptyAccount);
@@ -148,6 +150,28 @@ export default function App() {
 
     return matchOwner && matchGroup && matchType && matchTag && matchQ1 && matchQ2 && matchService;
   }), [visibleAccounts, search1, search2, filterOwner, filterGroups, filterTypes, filterTags, filterService, services]);
+
+  const sortedAccounts = useMemo(() => {
+    if (!sortKey) return filteredAccounts;
+    return [...filteredAccounts].sort((a, b) => {
+      let va = a[sortKey] || "";
+      let vb = b[sortKey] || "";
+      if (typeof va === "string") va = va.toLowerCase();
+      if (typeof vb === "string") vb = vb.toLowerCase();
+      if (va < vb) return sortDir === "asc" ? -1 : 1;
+      if (va > vb) return sortDir === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [filteredAccounts, sortKey, sortDir]);
+
+  const handleSort = (key) => {
+    if (sortKey === key) {
+      setSortDir(d => d === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
 
   const filteredServices = useMemo(() => {
     const accIds = new Set(filteredAccounts.map(a => a.id));
@@ -462,15 +486,15 @@ export default function App() {
       </div>
 
       {/* Filter Bar */}
-      <div style={{ padding: "12px 28px", background: "#0b0e1a", borderBottom: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ padding: "12px 28px", background: "#0f172a", borderBottom: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <input placeholder="검색 1..." value={search1} onChange={e => setSearch1(e.target.value)} style={{ ...inputSt, width: 180, background: C.bg, padding: "7px 12px" }} />
-          <input placeholder="검색 2..." value={search2} onChange={e => setSearch2(e.target.value)} style={{ ...inputSt, width: 180, background: C.bg, padding: "7px 12px" }} />
+          <input placeholder="검색 1..." value={search1} onChange={e => setSearch1(e.target.value)} style={{ ...inputSt, width: 180, padding: "7px 12px" }} />
+          <input placeholder="검색 2..." value={search2} onChange={e => setSearch2(e.target.value)} style={{ ...inputSt, width: 180, padding: "7px 12px" }} />
           <FilterSel label="소유자" value={filterOwner} options={ownerOptions} onChange={setFilterOwner} />
           <FilterSel label="서비스" value={filterService} options={["전체", "Y", "N"]} onChange={setFilterService} />
           <div style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", marginLeft: 8 }} onClick={() => setShowEnded(s => !s)}>
-            <div style={{ width: 36, height: 20, borderRadius: 10, position: "relative", background: showEnded ? C.warn + "88" : "#1e2540", border: `1px solid ${showEnded ? C.warn : C.border2}`, transition: "background 0.2s" }}>
-              <div style={{ position: "absolute", top: 2, left: showEnded ? 16 : 2, width: 14, height: 14, borderRadius: 7, background: showEnded ? C.warn : "#5a647a", transition: "left 0.2s" }} />
+            <div style={{ width: 36, height: 20, borderRadius: 10, position: "relative", background: showEnded ? C.warn + "88" : C.border, border: `1px solid ${showEnded ? C.warn : C.border2}`, transition: "background 0.2s" }}>
+              <div style={{ position: "absolute", top: 2, left: showEnded ? 16 : 2, width: 14, height: 14, borderRadius: 7, background: showEnded ? C.warn : C.sub, transition: "left 0.2s" }} />
             </div>
             <span style={{ fontSize: 12, color: C.muted, userSelect: "none" }}>이용종료 포함 {endedCount > 0 && `(${endedCount})`}</span>
           </div>
@@ -501,7 +525,8 @@ export default function App() {
       {/* Body */}
       <div style={{ flex: 1, overflow: "auto", padding: 0 }}>
         {tab === "accounts" ? (
-          <AccountsTab accounts={filteredAccounts} services={services} allAccounts={accounts} svcByAcc={svcByAcc} onEdit={openEditAcc}
+          <AccountsTab accounts={sortedAccounts} services={services} allAccounts={accounts} svcByAcc={svcByAcc} onEdit={openEditAcc}
+            sortKey={sortKey} sortDir={sortDir} onSort={handleSort}
             onDelete={r => setDelConfirm({ type: "account", id: r.id, label: `${r.owner}의 ${r.username}` })}
             onDeactivate={a => setDeactivateConfirm(a)} onActivate={a => setActivateConfirm(a)}
             onVisit={visitAccount} onResetVisits={resetVisits}

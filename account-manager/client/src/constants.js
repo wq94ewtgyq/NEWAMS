@@ -58,19 +58,20 @@ export function fmtCost(v) {
 // 색상 / 스타일 — 브랜드 컬러 #E81E1E
 // ─────────────────────────────────────────────────────
 export const C = {
-  bg: "#090c17", surface: "#0f1220", border: "#1c2238", border2: "#242b42",
-  text: "#dde2f0", muted: "#5a647a",
-  accent: "#00d4aa", blue: "#4d8cff", warn: "#f59e0b", danger: "#ff5f5f",
-  ended: "#3a4050", green: "#00d4aa", brand: "#E81E1E",
+  bg: "#111827", surface: "#1f2937", border: "#374151", border2: "#4b5563",
+  text: "#f3f4f6", muted: "#9ca3af", sub: "#6b7280",
+  accent: "#10b981", blue: "#3b82f6", warn: "#f59e0b", danger: "#ef4444",
+  ended: "#4b5563", green: "#10b981", brand: "#E81E1E",
+  rowEven: "#111827", rowOdd: "#1a2332", rowHover: "#1e3a5f",
 };
 export const inputSt = {
-  background: "#070a14", border: `1px solid ${C.border2}`,
+  background: "#0f172a", border: `1px solid ${C.border}`,
   borderRadius: 7, color: C.text, padding: "8px 11px",
   fontSize: 13, outline: "none", fontFamily: "inherit",
   width: "100%", boxSizing: "border-box",
 };
-export const tdSt = { padding: "11px 13px", verticalAlign: "middle", whiteSpace: "nowrap" };
-export const groupColors = { "메인": "#a78bfa", "업무유틸": "#4d8cff", "데일리": "#f59e0b" };
+export const tdSt = { padding: "10px 14px", verticalAlign: "middle", whiteSpace: "nowrap" };
+export const groupColors = { "메인": "#a78bfa", "업무유틸": "#3b82f6", "데일리": "#f59e0b" };
 
 // ─────────────────────────────────────────────────────
 // 인증방법 옵션

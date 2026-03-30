@@ -26,15 +26,20 @@ export function CopyBtn({ text, label }) {
 export function PwCell({ value }) {
   const [show, set] = useState(false);
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-      <span style={{ fontFamily: "monospace", fontSize: 12, color: show ? C.text : C.muted, letterSpacing: show ? 1 : 2 }}>
-        {show ? value : "••••••••"}
+    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <span style={{ fontFamily: "monospace", fontSize: 12, color: show ? C.text : C.sub, letterSpacing: show ? 0.5 : 2, minWidth: 70 }}>
+        {show ? value : "••••••"}
       </span>
       <button onClick={e => { e.stopPropagation(); set(s => !s); }}
-        style={{ background: "none", border: "none", cursor: "pointer", color: show ? C.accent : C.muted, fontSize: 14, padding: "0 2px" }}>
-        {show ? "👁" : "👁‍🗨"}
+        style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 4, cursor: "pointer", color: show ? C.accent : C.sub, fontSize: 12, padding: "2px 6px", lineHeight: 1 }}
+        title={show ? "숨기기" : "보기"}>
+        {show ? "숨김" : "보기"}
       </button>
-      <CopyBtn text={value} label="PW" />
+      <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(value); }}
+        style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 4, cursor: "pointer", color: C.sub, fontSize: 12, padding: "2px 6px", lineHeight: 1 }}
+        title="복사">
+        복사
+      </button>
     </div>
   );
 }
@@ -204,7 +209,7 @@ export function SearchableDropdown({ value, onChange, options, onManage, placeho
       {open && (
         <div style={{
           position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
-          background: "#0a0d18", border: `1px solid ${C.border2}`, borderRadius: 7,
+          background: "#0f172a", border: `1px solid ${C.border2}`, borderRadius: 7,
           maxHeight: 200, overflowY: "auto", marginTop: 2,
           boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
         }}>
@@ -402,7 +407,7 @@ export function MultiTagInput({ selected = [], onChange, options = [], onManage,
       {open && filtered.length > 0 && (
         <div style={{
           position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
-          background: "#0a0d18", border: `1px solid ${C.border2}`, borderRadius: 7,
+          background: "#0f172a", border: `1px solid ${C.border2}`, borderRadius: 7,
           maxHeight: 180, overflowY: "auto", marginTop: 2,
           boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
         }}>
