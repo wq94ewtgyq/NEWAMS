@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import * as XLSX from "xlsx";
 import { C, inputSt, groupColors, loadData, saveAllData, calcExpiry, daysLeft, uid, emptyAccount, emptyService, getLoginType } from "./constants.js";
-import { Btn, Modal, ModalHeader, ModalFooter, FilterSel, ButtonFilter, Toast, Spinner, AccountForm, ServiceForm, ManageListModal } from "./components.jsx";
+import { Btn, Modal, ModalHeader, ModalFooter, FilterSel, FilterBtn, ButtonFilter, Toast, Spinner, AccountForm, ServiceForm, ManageListModal } from "./components.jsx";
 import { AccountsTab, ServicesTab } from "./tabs.jsx";
 
 // ─────────────────────────────────────────────────────
@@ -493,17 +493,15 @@ export default function App() {
           <input placeholder="검색 2..." value={search2} onChange={e => setSearch2(e.target.value)} style={{ ...inputSt, width: 200, padding: "6px 12px", fontSize: 12 }} />
           <FilterSel label="소유자" value={filterOwner} options={ownerOptions} onChange={setFilterOwner} />
           <FilterSel label="서비스" value={filterService} options={["전체", "Y", "N"]} onChange={setFilterService} />
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
-            <button onClick={() => setShowEnded(s => !s)}
-              style={{ background: showEnded ? C.warn + "18" : "transparent", color: showEnded ? C.warn : C.sub, border: `1px solid ${showEnded ? C.warn + "40" : "transparent"}`, borderRadius: 4, padding: "3px 10px", fontSize: 11, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, marginLeft: "auto" }}>
+            <FilterBtn active={showEnded} color={C.warn} onClick={() => setShowEnded(s => !s)}>
               이용종료 포함 {endedCount > 0 && `(${endedCount})`}
-            </button>
-            <button onClick={() => setShowInactive(s => !s)}
-              style={{ background: showInactive ? C.muted + "18" : "transparent", color: showInactive ? C.text : C.sub, border: `1px solid ${showInactive ? C.muted + "40" : "transparent"}`, borderRadius: 4, padding: "3px 10px", fontSize: 11, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s" }}>
+            </FilterBtn>
+            <FilterBtn active={showInactive} color={C.muted} onClick={() => setShowInactive(s => !s)}>
               비활성 포함 {inactiveCount > 0 && `(${inactiveCount})`}
-            </button>
+            </FilterBtn>
             {accounts.some(a => a.visitHighlight) && (
-              <button onClick={resetVisits} style={{ background: "#172554", border: `1px solid ${C.blue}40`, borderRadius: 4, color: C.blue, cursor: "pointer", fontSize: 11, fontWeight: 600, padding: "3px 10px", whiteSpace: "nowrap", transition: "all 0.15s" }}>음영초기화</button>
+              <FilterBtn active={true} color={C.blue} onClick={resetVisits}>음영초기화</FilterBtn>
             )}
             <span style={{ fontSize: 11, color: C.sub, marginLeft: 8 }}>{tab === "accounts" ? `${filteredAccounts.length}개` : `${filteredServices.length}개`}</span>
           </div>

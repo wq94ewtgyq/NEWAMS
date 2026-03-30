@@ -157,6 +157,34 @@ export function FilterSel({ label, value, options, onChange }) {
     </div>
   );
 }
+const filterBtnHover = (e, bg) => { e.currentTarget.style.background = bg; e.currentTarget.style.transform = "translateY(-1px)"; };
+const filterBtnLeave = (e, bg) => { e.currentTarget.style.background = bg; e.currentTarget.style.transform = "none"; };
+const filterBtnDown = (e) => { e.currentTarget.style.transform = "scale(0.97)"; };
+const filterBtnUp = (e) => { e.currentTarget.style.transform = "translateY(-1px)"; };
+
+export function FilterBtn({ active, color, onClick, children, style: extraStyle }) {
+  const bg = active ? color + "20" : "transparent";
+  const hBg = active ? color + "30" : color + "12";
+  return (
+    <button onClick={onClick}
+      onMouseEnter={e => filterBtnHover(e, hBg)}
+      onMouseLeave={e => filterBtnLeave(e, bg)}
+      onMouseDown={filterBtnDown} onMouseUp={filterBtnUp}
+      style={{
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        height: 26, padding: "0 10px", borderRadius: 5,
+        background: bg, color: active ? color : C.sub,
+        border: `1px solid ${active ? color + "40" : "transparent"}`,
+        fontSize: 11, fontWeight: active ? 700 : 500, cursor: "pointer",
+        whiteSpace: "nowrap", transition: "all 0.15s ease",
+        opacity: active ? 1 : 0.6,
+        ...extraStyle,
+      }}>
+      {children}
+    </button>
+  );
+}
+
 export function ButtonFilter({ label, options, selected, onChange, color = C.blue }) {
   const isAll = selected.length === 0;
   const hasSelection = selected.length > 0;
@@ -167,33 +195,13 @@ export function ButtonFilter({ label, options, selected, onChange, color = C.blu
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
       <span style={{ fontSize: 11, color: hasSelection ? color : C.sub, fontWeight: 700, marginRight: 2, minWidth: 30 }}>{label}</span>
-      <button onClick={() => onChange([])}
-        style={{
-          background: isAll ? color + "20" : "transparent",
-          color: isAll ? color : C.sub,
-          border: `1px solid ${isAll ? color + "40" : "transparent"}`,
-          borderRadius: 4, padding: "2px 8px", fontSize: 11, fontWeight: 600,
-          cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s",
-          opacity: isAll ? 1 : 0.5,
-        }}>
-        전체
-      </button>
-      {options.map(o => {
-        const active = selected.includes(o);
-        return (
-          <button key={o} onClick={() => toggle(o)}
-            style={{
-              background: active ? color + "20" : "transparent",
-              color: active ? color : C.sub,
-              border: `1px solid ${active ? color + "40" : "transparent"}`,
-              borderRadius: 4, padding: "2px 8px", fontSize: 11, fontWeight: active ? 700 : 500,
-              cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s",
-              opacity: active ? 1 : (hasSelection ? 0.4 : 0.6),
-            }}>
-            {o}
-          </button>
-        );
-      })}
+      <FilterBtn active={isAll} color={color} onClick={() => onChange([])}>전체</FilterBtn>
+      {options.map(o => (
+        <FilterBtn key={o} active={selected.includes(o)} color={color} onClick={() => toggle(o)}
+          style={{ opacity: selected.includes(o) ? 1 : (hasSelection ? 0.35 : 0.6) }}>
+          {o}
+        </FilterBtn>
+      ))}
     </div>
   );
 }
