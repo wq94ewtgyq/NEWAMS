@@ -49,6 +49,8 @@ export default function App() {
   const [svcForm, setSvcForm]       = useState(emptyService);
   const [delConfirm, setDelConfirm] = useState(null);
   const [endConfirm, setEndConfirm] = useState(null);
+  const [deactivateConfirm, setDeactivateConfirm] = useState(null);
+  const [activateConfirm, setActivateConfirm] = useState(null);
 
   const [manageOwners, setManageOwners]         = useState(false);
   const [manageGroups, setManageGroups]          = useState(false);
@@ -207,16 +209,18 @@ export default function App() {
     showToast("계정이 복구되었습니다.");
   };
 
-  const deactivateAcc = async id => {
-    const nextAcc = accounts.map(a => a.id === id ? { ...a, status: "inactive" } : a);
-    setAccounts(nextAcc);
+  const confirmDeactivate = async () => {
+    if (!deactivateConfirm) return;
+    const nextAcc = accounts.map(a => a.id === deactivateConfirm.id ? { ...a, status: "inactive" } : a);
+    setAccounts(nextAcc); setDeactivateConfirm(null);
     await persist(nextAcc, services);
     showToast("계정이 비활성 처리되었습니다.");
   };
 
-  const activateAcc = async id => {
-    const nextAcc = accounts.map(a => a.id === id ? { ...a, status: "active" } : a);
-    setAccounts(nextAcc);
+  const confirmActivate = async () => {
+    if (!activateConfirm) return;
+    const nextAcc = accounts.map(a => a.id === activateConfirm.id ? { ...a, status: "active" } : a);
+    setAccounts(nextAcc); setActivateConfirm(null);
     await persist(nextAcc, services);
     showToast("계정이 활성화되었습니다.");
   };
@@ -504,7 +508,7 @@ export default function App() {
         {tab === "accounts" ? (
           <AccountsTab accounts={filteredAccounts} services={services} allAccounts={accounts} svcByAcc={svcByAcc} onEdit={openEditAcc}
             onDelete={r => setDelConfirm({ type: "account", id: r.id, label: `${r.owner}의 ${r.username}` })}
-            onDeactivate={deactivateAcc} onActivate={activateAcc}
+            onDeactivate={a => setDeactivateConfirm(a)} onActivate={a => setActivateConfirm(a)}
             onVisit={visitAccount} onResetVisits={resetVisits}
             onAddService={openAddSvc} onEditSvc={openEditSvc} onRenewSvc={openRenewSvc}
             onEndSvc={s => setEndConfirm(s)} onReactivate={reactivate}
@@ -557,6 +561,34 @@ export default function App() {
             <Btn danger disabled={saving} onClick={() => delConfirm.type === "account" ? deleteAcc(delConfirm.id) : deleteSvc(delConfirm.id)}>
               {saving ? "삭제 중..." : "삭제"}
             </Btn>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 비활성 Confirm */}
+      <Modal open={!!deactivateConfirm} onClose={() => !saving && setDeactivateConfirm(null)}>
+        <div style={{ textAlign: "center", padding: "8px 0 4px" }}>
+          <div style={{ fontSize: 38, marginBottom: 12 }}>⚠️</div>
+          <h3 style={{ color: "#fff", margin: "0 0 8px", fontSize: 17 }}>정말로 비활성화 하시겠습니까?</h3>
+          <p style={{ color: C.muted, fontSize: 13, margin: "0 0 6px" }}><strong style={{ color: C.text }}>{deactivateConfirm?.owner} · {deactivateConfirm?.username}</strong></p>
+          <p style={{ color: C.muted, fontSize: 12, margin: "0 0 22px" }}>비활성된 계정은 기본 목록에서 숨겨집니다.</p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+            <Btn ghost onClick={() => setDeactivateConfirm(null)} disabled={saving}>취소</Btn>
+            <Btn warn onClick={confirmDeactivate} disabled={saving}>{saving ? "처리 중..." : "비활성화"}</Btn>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 복구 Confirm */}
+      <Modal open={!!activateConfirm} onClose={() => !saving && setActivateConfirm(null)}>
+        <div style={{ textAlign: "center", padding: "8px 0 4px" }}>
+          <div style={{ fontSize: 38, marginBottom: 12 }}>🔄</div>
+          <h3 style={{ color: "#fff", margin: "0 0 8px", fontSize: 17 }}>정말로 복구 하시겠습니까?</h3>
+          <p style={{ color: C.muted, fontSize: 13, margin: "0 0 6px" }}><strong style={{ color: C.text }}>{activateConfirm?.owner} · {activateConfirm?.username}</strong></p>
+          <p style={{ color: C.muted, fontSize: 12, margin: "0 0 22px" }}>계정이 활성 상태로 복구됩니다.</p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+            <Btn ghost onClick={() => setActivateConfirm(null)} disabled={saving}>취소</Btn>
+            <Btn accent onClick={confirmActivate} disabled={saving}>{saving ? "처리 중..." : "복구"}</Btn>
           </div>
         </div>
       </Modal>

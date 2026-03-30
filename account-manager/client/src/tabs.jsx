@@ -130,9 +130,9 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                     <div style={{ display: "flex", gap: 4 }}>
                       <Btn small blue onClick={() => onEdit(a)}>수정</Btn>
                       {isInactive ? (
-                        <><Btn small green onClick={() => onActivate(a.id)}>복구</Btn><Btn small danger onClick={() => onDelete(a)}>삭제</Btn></>
+                        <><Btn small green onClick={() => onActivate(a)}>복구</Btn><Btn small danger onClick={() => onDelete(a)}>삭제</Btn></>
                       ) : (
-                        <Btn small ghost onClick={() => onDeactivate(a.id)}>비활성</Btn>
+                        <Btn small ghost onClick={() => onDeactivate(a)}>비활성</Btn>
                       )}
                     </div>
                   </td>
