@@ -115,13 +115,13 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                     </div>
                   </td>
                   <td style={tdSt}>{a.group ? <Tag text={a.group} color={grpColor} /> : <span style={{ color: C.sub }}>—</span>}</td>
-                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.types || []).length > 0 ? (a.types || []).map(t => <span key={t} style={{ color: C.muted, fontSize: 11, background: C.border + "60", borderRadius: 4, padding: "1px 6px" }}>{t}</span>) : <span style={{ color: C.sub }}>—</span>}</div></td>
-                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.tags || []).length > 0 ? (a.tags || []).map(t => <span key={t} style={{ color: C.sub, fontSize: 11, background: C.border + "40", borderRadius: 4, padding: "1px 6px" }}>{t}</span>) : <span style={{ color: C.sub }}>—</span>}</div></td>
+                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap", opacity: 0.7 }}>{(a.types || []).length > 0 ? (a.types || []).map(t => <span key={t} style={{ color: C.muted, fontSize: 10, background: C.border + "50", borderRadius: 3, padding: "1px 5px" }}>{t}</span>) : <span style={{ color: C.sub }}>—</span>}</div></td>
+                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap", opacity: 0.5 }}>{(a.tags || []).length > 0 ? (a.tags || []).map(t => <span key={t} style={{ color: C.sub, fontSize: 10, background: C.border + "30", borderRadius: 3, padding: "1px 5px" }}>{t}</span>) : <span style={{ color: C.sub }}>—</span>}</div></td>
                   <td style={tdSt}>
-                    <span style={{ fontWeight: 700, color: C.text, fontSize: 14 }}>{a.siteName || "—"}</span>
+                    <span style={{ fontWeight: 800, color: "#ffffff", fontSize: 14, letterSpacing: -0.2 }}>{a.siteName || "—"}</span>
                   </td>
                   <td style={tdSt}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, opacity: 0.7 }}>
                       <span style={{ fontFamily: "monospace", color: C.muted, fontSize: 12 }}>{a.username || "—"}</span>
                       {a.username && <CopyBtn text={a.username} label="ID" />}
                     </div>
