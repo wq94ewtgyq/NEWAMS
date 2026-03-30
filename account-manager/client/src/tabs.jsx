@@ -80,14 +80,15 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
     <div>
       <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontSize: 13, tableLayout: "fixed" }}>
         <colgroup>
-          <col style={{ width: 40 }} />
-          <col style={{ width: 90 }} />
-          <col style={{ width: 220 }} />
-          <col style={{ width: 260 }} />
-          <col style={{ width: 180 }} />
-          <col style={{ width: 88 }} />
-          <col style={{ width: 110 }} />
+          <col style={{ width: 36 }} />
           <col style={{ width: 80 }} />
+          <col style={{ width: 180 }} />
+          <col style={{ width: 200 }} />
+          <col style={{ width: 170 }} />
+          <col style={{ width: 120 }} />
+          <col style={{ width: 60 }} />
+          <col style={{ width: 80 }} />
+          <col style={{ width: 60 }} />
           <col style={{ width: 120 }} />
         </colgroup>
         <thead>
@@ -97,6 +98,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
             <SortTh k="siteName">사이트명</SortTh>
             <th style={thSt}>아이디</th>
             <th style={thSt}>패스워드</th>
+            <th style={thSt}>2차인증</th>
             <th style={thSt}>접속</th>
             <SortTh k="lastVisited">최근접속</SortTh>
             <th style={thSt}>서비스</th>
@@ -145,6 +147,9 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   <td style={tdSt} onClick={e => e.stopPropagation()}>
                     {a.password ? <PwCell value={a.password} /> : <span style={{ color: C.sub }}>—</span>}
                   </td>
+                  <td style={tdSt}>
+                    {(() => { const auth = (a.authInfos || []).find(ai => ai.method !== "없음"); if (!auth) return <span style={{ color: C.sub }}>—</span>; const detail = [auth.phone, auth.email, auth.certName, auth.serviceName].filter(Boolean).join(" "); return <span style={{ color: C.muted, fontSize: 11 }}>{auth.method}{detail ? ` · ${detail}` : ""}</span>; })()}
+                  </td>
                   <td style={tdSt} onClick={e => e.stopPropagation()}>
                     {a.url ? (
                       <a href={a.url.startsWith("http") ? a.url : `https://${a.url}`} target="_blank" rel="noreferrer"
@@ -177,7 +182,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                 </tr>
                 {isOpen && (
                   <tr key={a.id + "_detail"} style={{ background: C.rowEven }}>
-                    <td colSpan={9} style={{ padding: 0, borderLeft: `3px solid ${grpColor}40` }}>
+                    <td colSpan={10} style={{ padding: 0, borderLeft: `3px solid ${grpColor}40` }}>
                       <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}` }}>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: "12px 20px", marginBottom: 14 }}>
                           {[
@@ -227,7 +232,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
             );
           })}
           {accounts.length === 0 && (
-            <tr><td colSpan={9} style={{ textAlign: "center", padding: 60, color: C.sub }}>계정이 없습니다.</td></tr>
+            <tr><td colSpan={10} style={{ textAlign: "center", padding: 60, color: C.sub }}>계정이 없습니다.</td></tr>
           )}
         </tbody>
       </table>
