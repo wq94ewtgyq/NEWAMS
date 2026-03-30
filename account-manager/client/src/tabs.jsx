@@ -189,13 +189,21 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                             ["계정소유자", a.owner],
                             ["로그인방법", getLoginType(a)],
                             ["연동계정", getLinkedLabel(a.linkedAccount)],
-                            ["URL", a.url],
                           ].map(([label, val]) => (
                             <div key={label}>
                               <div style={{ fontSize: 10, color: C.sub, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 700, marginBottom: 4 }}>{label}</div>
                               <span style={{ fontSize: 13, color: val ? C.text : C.sub }}>{val || "—"}</span>
                             </div>
                           ))}
+                          <div>
+                            <div style={{ fontSize: 10, color: C.sub, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 700, marginBottom: 4 }}>URL</div>
+                            {a.url ? (
+                              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                <span title={a.url} style={{ fontSize: 13, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 250 }}>{a.url}</span>
+                                <IdCopyBtn text={a.url} />
+                              </div>
+                            ) : <span style={{ fontSize: 13, color: C.sub }}>—</span>}
+                          </div>
                           {(a.authInfos || []).filter(ai => ai.method !== "없음").map((ai, idx) => {
                             const detail = [ai.phone, ai.serviceName, ai.email, ai.certName, ai.contact].filter(Boolean).join(" · ");
                             return (
