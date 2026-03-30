@@ -489,7 +489,14 @@ export default function App() {
         </div>
         <ButtonFilter label="그룹" options={groupOptions} selected={filterGroups} onChange={setFilterGroups} color="#a78bfa" />
         <ButtonFilter label="유형" options={filteredTypeOptions} selected={filterTypes} onChange={setFilterTypes} color={C.blue} />
-        <ButtonFilter label="태그" options={filteredTagOptions} selected={filterTags} onChange={setFilterTags} color={C.green} />
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div style={{ flex: 1 }}>
+            <ButtonFilter label="태그" options={filteredTagOptions} selected={filterTags} onChange={setFilterTags} color={C.green} />
+          </div>
+          {accounts.some(a => a.visitHighlight) && (
+            <Btn small ghost onClick={resetVisits}>접속음영 초기화</Btn>
+          )}
+        </div>
       </div>
 
       {/* Body */}
