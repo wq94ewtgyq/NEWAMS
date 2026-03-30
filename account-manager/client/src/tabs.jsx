@@ -78,7 +78,18 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
 
   return (
     <div>
-      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontSize: 13, minWidth: 1000 }}>
+      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontSize: 13, tableLayout: "fixed" }}>
+        <colgroup>
+          <col style={{ width: 40 }} />
+          <col style={{ width: 100 }} />
+          <col style={{ width: "auto" }} />
+          <col style={{ width: 180 }} />
+          <col style={{ width: 180 }} />
+          <col style={{ width: 60 }} />
+          <col style={{ width: 80 }} />
+          <col style={{ width: 60 }} />
+          <col style={{ width: 130 }} />
+        </colgroup>
         <thead>
           <tr>
             <th style={thSt}></th>
@@ -101,6 +112,8 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
             const activeCount = svcs.filter(s => s.status === "active").length;
             const isInactive = a.status === "inactive";
             const grpColor = groupColors[a.group] || C.sub;
+            const isHov = hovered === a.id;
+            const hasMeta = (a.types || []).length > 0 || (a.tags || []).length > 0;
             return (
               <>
                 <tr key={a.id} style={{ background: rowBg, borderBottom: `1px solid ${isVisited ? C.blue + "30" : C.border}`, cursor: "pointer", opacity: isInactive ? 0.45 : 1, borderLeft: `3px solid ${grpColor}40` }}
@@ -113,16 +126,14 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                       {isInactive && <Tag text="비활성" color={C.sub} />}
                     </div>
                   </td>
-                  <td style={tdSt}>{a.group ? <Tag text={a.group} color={grpColor} /> : <span style={{ color: C.sub }}>—</span>}</td>
-                  <td style={tdSt}>
+                  <td style={tdSt}>{a.group ? <span style={{ color: grpColor, fontWeight: 700, fontSize: 12 }}>{a.group}</span> : <span style={{ color: C.sub }}>—</span>}</td>
+                  <td style={{ ...tdSt, overflow: "hidden" }}>
                     <div>
                       <span style={{ fontWeight: 800, color: "#ffffff", fontSize: 14, letterSpacing: -0.2 }}>{a.siteName || "—"}</span>
-                      {hovered === a.id && ((a.types || []).length > 0 || (a.tags || []).length > 0) && (
-                        <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 4, animation: "fadeIn 0.15s ease" }}>
-                          {(a.types || []).map(t => <span key={"t_"+t} style={{ color: C.muted, fontSize: 10, background: C.border + "50", borderRadius: 3, padding: "1px 5px" }}>{t}</span>)}
-                          {(a.tags || []).map(t => <span key={"g_"+t} style={{ color: C.sub, fontSize: 10, background: C.border + "30", borderRadius: 3, padding: "1px 5px" }}>{t}</span>)}
-                        </div>
-                      )}
+                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: hasMeta ? 3 : 0, height: hasMeta ? "auto" : 0, overflow: "hidden", opacity: isHov ? 1 : 0, visibility: isHov ? "visible" : "hidden", transition: "opacity 0.15s" }}>
+                        {(a.types || []).map(t => <span key={"t_"+t} style={{ color: C.muted, fontSize: 10, background: C.border + "50", borderRadius: 3, padding: "1px 5px" }}>{t}</span>)}
+                        {(a.tags || []).map(t => <span key={"g_"+t} style={{ color: C.sub, fontSize: 10, background: C.border + "30", borderRadius: 3, padding: "1px 5px" }}>{t}</span>)}
+                      </div>
                     </div>
                   </td>
                   <td style={tdSt}>
