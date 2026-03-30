@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { C, calcExpiry, daysLeft, fmtDate, fmtCost, tdSt, groupColors, getLoginType } from "./constants.js";
-import { Tag, PwCell, CopyBtn, Btn } from "./components.jsx";
+import { Tag, PwCell, IdCopyBtn, CopyBtn, Btn } from "./components.jsx";
 
 // ─────────────────────────────────────────────────────
 // 서비스 인라인 행
@@ -139,7 +139,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   <td style={tdSt}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, opacity: 0.7 }}>
                       <span style={{ fontFamily: "monospace", color: C.muted, fontSize: 12 }}>{a.username || "—"}</span>
-                      {a.username && <CopyBtn text={a.username} label="복사" />}
+                      {a.username && <IdCopyBtn text={a.username} />}
                     </div>
                   </td>
                   <td style={tdSt} onClick={e => e.stopPropagation()}>

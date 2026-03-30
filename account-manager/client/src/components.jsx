@@ -23,6 +23,17 @@ export function CopyBtn({ text, label }) {
     </button>
   );
 }
+export function IdCopyBtn({ text }) {
+  const [copied, setCopied] = useState(false);
+  const copy = e => { e.stopPropagation(); navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); };
+  return (
+    <button onClick={copy}
+      style={{ background: copied ? C.accent + "22" : "none", border: `1px solid ${copied ? C.accent + "44" : C.border}`, borderRadius: 4, cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 12, padding: "2px 6px", lineHeight: 1, transition: "all 0.15s" }}
+      title="복사">
+      {copied ? "✓ 복사됨" : "복사"}
+    </button>
+  );
+}
 export function PwCell({ value }) {
   const [show, set] = useState(false);
   const [copied, setCopied] = useState(false);
