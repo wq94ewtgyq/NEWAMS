@@ -28,7 +28,9 @@ export function IdCopyBtn({ text }) {
   const copy = e => { e.stopPropagation(); navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); };
   return (
     <button onClick={copy}
-      style={{ background: "none", border: "none", cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 13, padding: 0, lineHeight: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, flexShrink: 0, transition: "color 0.15s" }}
+      onMouseEnter={e => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "scale(1.1)"; }}
+      onMouseLeave={e => { e.currentTarget.style.opacity = copied ? "1" : "0.5"; e.currentTarget.style.transform = "scale(1)"; }}
+      style={{ background: "none", border: "none", cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 13, padding: 0, lineHeight: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, flexShrink: 0, opacity: copied ? 1 : 0.5, transition: "all 0.15s" }}
       title={copied ? "복사됨" : "복사"}>
       {copied ? "✓" : "⧉"}
     </button>
@@ -44,7 +46,9 @@ export function PwCell({ value }) {
         {show ? value : "••••••"}
       </span>
       <button onClick={copy}
-        style={{ background: "none", border: "none", cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 13, padding: 0, lineHeight: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, flexShrink: 0, transition: "color 0.15s" }}
+        onMouseEnter={e => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "scale(1.1)"; }}
+        onMouseLeave={e => { e.currentTarget.style.opacity = copied ? "1" : "0.5"; e.currentTarget.style.transform = "scale(1)"; }}
+        style={{ background: "none", border: "none", cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 13, padding: 0, lineHeight: 1, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, flexShrink: 0, opacity: copied ? 1 : 0.5, transition: "all 0.15s" }}
         title={copied ? "복사됨" : "복사"}>
         {copied ? "✓" : "⧉"}
       </button>
