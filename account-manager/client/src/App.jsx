@@ -221,7 +221,10 @@ export default function App() {
   const exportExcel = () => {
     const data = accounts.map(a => {
       const svcs = services.filter(s => s.accountId === a.id && s.status === "active");
-      const authStr = (a.authInfos || []).map(ai => `${ai.method}:${ai.contact}`).join(" / ");
+      const authStr = (a.authInfos || []).filter(ai => ai.method !== "없음").map(ai => {
+        const parts = [ai.method, ai.phone, ai.serviceName, ai.email, ai.certName, ai.contact].filter(Boolean);
+        return parts.join(":");
+      }).join(" / ");
       const linkedAcc = accounts.find(la => la.id === a.linkedAccount);
       const linkedStr = linkedAcc ? `${linkedAcc.siteName || linkedAcc.url || ""}(${linkedAcc.username || ""})` : "";
       return {
@@ -279,9 +282,18 @@ export default function App() {
 
           const authStr = String(row["인증정보"] || "");
           const authInfos = authStr ? authStr.split(" / ").map(s => {
-            const [method, contact] = s.split(":");
-            return { method: method || "없음", contact: contact || "" };
-          }) : [{ method: "없음", contact: "" }];
+            const parts = s.split(":");
+            const method = parts[0] || "없음";
+            const info = { method };
+            const fieldMap = { "SMS문자": "phone", "카카오톡": "phone", "이메일": "email", "공인인증서": "certName" };
+            if (method === "휴대폰OTP") {
+              info.serviceName = parts[1] || "";
+              info.phone = parts[2] || "";
+            } else if (fieldMap[method]) {
+              info[fieldMap[method]] = parts[1] || "";
+            }
+            return info;
+          }) : [{ method: "없음" }];
 
           const rowPlatforms = parseTags(row["플랫폼"]);
           const rowTypes = parseTags(row["유형"]);

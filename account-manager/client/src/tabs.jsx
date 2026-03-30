@@ -132,12 +132,15 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                               <span style={{ fontSize: 13, color: val ? C.text : C.muted }}>{val || "—"}</span>
                             </div>
                           ))}
-                          {(a.authInfos || []).filter(ai => ai.method !== "없음").map((ai, idx) => (
-                            <div key={`auth-${idx}`}>
-                              <div style={{ fontSize: 10, color: C.muted, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 700, marginBottom: 4 }}>인증{idx + 1}</div>
-                              <span style={{ fontSize: 13, color: C.text }}>{ai.method} · {ai.contact || "—"}</span>
-                            </div>
-                          ))}
+                          {(a.authInfos || []).filter(ai => ai.method !== "없음").map((ai, idx) => {
+                            const detail = [ai.phone, ai.serviceName, ai.email, ai.certName, ai.contact].filter(Boolean).join(" · ");
+                            return (
+                              <div key={`auth-${idx}`}>
+                                <div style={{ fontSize: 10, color: C.muted, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 700, marginBottom: 4 }}>인증{idx + 1}</div>
+                                <span style={{ fontSize: 13, color: C.text }}>{ai.method}{detail ? ` · ${detail}` : ""}</span>
+                              </div>
+                            );
+                          })}
                           {a.note && (
                             <div>
                               <div style={{ fontSize: 10, color: C.muted, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 700, marginBottom: 4 }}>비고</div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { C, inputSt, AUTH_METHODS } from "./constants.js";
+import { C, inputSt, AUTH_METHODS, AUTH_FIELDS } from "./constants.js";
 
 // ─────────────────────────────────────────────────────
 // 공통 소형 컴포넌트
@@ -235,28 +235,37 @@ export function AuthInfoList({ authInfos, onChange }) {
     const next = authInfos.map((a, i) => i === idx ? { ...a, [key]: val } : a);
     onChange(next);
   };
-  const add = () => onChange([...authInfos, { method: "없음", contact: "" }]);
+  const changeMethod = (idx, method) => {
+    const next = authInfos.map((a, i) => i === idx ? { method } : a);
+    onChange(next);
+  };
+  const add = () => onChange([...authInfos, { method: "없음" }]);
   const remove = idx => {
     if (authInfos.length <= 1) return;
     onChange(authInfos.filter((_, i) => i !== idx));
   };
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      {authInfos.map((info, i) => (
-        <div key={i} style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <div style={{ flex: 1 }}>
-            <Sel value={info.method} onChange={v => update(i, "method", v)} options={AUTH_METHODS} />
+      {authInfos.map((info, i) => {
+        const fields = AUTH_FIELDS[info.method] || [];
+        return (
+          <div key={i} style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ minWidth: 130 }}>
+              <Sel value={info.method} onChange={v => changeMethod(i, v)} options={AUTH_METHODS} />
+            </div>
+            {fields.map(f => (
+              <div key={f.key} style={{ flex: 1, minWidth: 140 }}>
+                <input value={info[f.key] || ""} onChange={e => update(i, f.key, e.target.value)}
+                  placeholder={`${f.label} (${f.placeholder})`} style={inputSt} />
+              </div>
+            ))}
+            <button onClick={() => remove(i)} disabled={authInfos.length <= 1}
+              style={{ background: "none", border: "none", color: authInfos.length <= 1 ? C.border2 : C.danger, cursor: authInfos.length <= 1 ? "default" : "pointer", fontSize: 16, padding: "0 4px", flexShrink: 0 }}>
+              ✕
+            </button>
           </div>
-          <div style={{ flex: 1 }}>
-            <input value={info.contact} onChange={e => update(i, "contact", e.target.value)}
-              placeholder="인증연락처" style={inputSt} />
-          </div>
-          <button onClick={() => remove(i)} disabled={authInfos.length <= 1}
-            style={{ background: "none", border: "none", color: authInfos.length <= 1 ? C.border2 : C.danger, cursor: authInfos.length <= 1 ? "default" : "pointer", fontSize: 16, padding: "0 4px", flexShrink: 0 }}>
-            ✕
-          </button>
-        </div>
-      ))}
+        );
+      })}
       <button onClick={add}
         style={{ background: "none", border: `1px dashed ${C.border2}`, color: C.muted, borderRadius: 6, padding: "6px 0", cursor: "pointer", fontSize: 12, width: "100%" }}>
         + 인증정보 추가

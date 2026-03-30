@@ -76,7 +76,16 @@ export const groupColors = { "메인": "#E81E1E", "업무유틸": "#4d8cff", "�
 // ─────────────────────────────────────────────────────
 // 인증방법 옵션
 // ─────────────────────────────────────────────────────
-export const AUTH_METHODS = ["없음", "휴대폰문자", "휴대폰OTP", "이메일OTP", "보안카드"];
+export const AUTH_METHODS = ["없음", "SMS문자", "카카오톡", "휴대폰OTP", "이메일", "공인인증서"];
+
+export const AUTH_FIELDS = {
+  "없음": [],
+  "SMS문자": [{ key: "phone", label: "휴대폰번호", placeholder: "010-0000-0000" }],
+  "카카오톡": [{ key: "phone", label: "휴대폰번호", placeholder: "010-0000-0000" }],
+  "휴대폰OTP": [{ key: "serviceName", label: "서비스명", placeholder: "Google Authenticator" }, { key: "phone", label: "휴대폰번호", placeholder: "010-0000-0000" }],
+  "이메일": [{ key: "email", label: "이메일", placeholder: "user@example.com" }],
+  "공인인증서": [{ key: "certName", label: "인증서명", placeholder: "인증서 이름" }],
+};
 
 // ─────────────────────────────────────────────────────
 // 폼 초기값
