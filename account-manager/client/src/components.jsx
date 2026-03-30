@@ -49,7 +49,7 @@ export function PwCell({ value }) {
         {copied ? "✓" : "⧉"}
       </button>
       <button onClick={e => { e.stopPropagation(); set(s => !s); }}
-        style={{ background: "none", border: "none", cursor: "pointer", color: show ? C.accent : C.sub, fontSize: 12, padding: "0 2px", lineHeight: 1 }}
+        style={{ background: show ? C.accent + "15" : "none", border: `1px solid ${show ? C.accent + "40" : C.border}`, borderRadius: 4, cursor: "pointer", color: show ? C.accent : C.sub, fontSize: 11, padding: "2px 6px", lineHeight: 1, transition: "all 0.15s" }}
         title={show ? "숨기기" : "보기"}>
         {show ? "숨김" : "보기"}
       </button>
