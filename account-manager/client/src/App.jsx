@@ -104,8 +104,21 @@ export default function App() {
 
   const ownerOptions = useMemo(() => ["전체", ...new Set(accounts.map(a => a.owner).filter(Boolean))], [accounts]);
   const groupOptions = useMemo(() => [...new Set(accounts.map(a => a.group).filter(Boolean))], [accounts]);
-  const allTypes = useMemo(() => [...new Set(accounts.flatMap(a => a.types || []))], [accounts]);
-  const allTags = useMemo(() => [...new Set(accounts.flatMap(a => a.tags || []))], [accounts]);
+
+  const groupFilteredAccounts = useMemo(() => {
+    if (filterGroups.length === 0) return accounts;
+    return accounts.filter(a => filterGroups.includes(a.group));
+  }, [accounts, filterGroups]);
+
+  const filteredTypeOptions = useMemo(() => [...new Set(groupFilteredAccounts.flatMap(a => a.types || []))], [groupFilteredAccounts]);
+  const filteredTagOptions = useMemo(() => [...new Set(groupFilteredAccounts.flatMap(a => a.tags || []))], [groupFilteredAccounts]);
+
+  useEffect(() => {
+    setFilterTypes(prev => prev.filter(t => filteredTypeOptions.includes(t)));
+  }, [filteredTypeOptions]);
+  useEffect(() => {
+    setFilterTags(prev => prev.filter(t => filteredTagOptions.includes(t)));
+  }, [filteredTagOptions]);
 
   const visibleAccounts = useMemo(() => accounts.filter(a => {
     if (a.status === "deleted") return false;
@@ -474,11 +487,9 @@ export default function App() {
           </button>
           <span style={{ fontSize: 11, color: C.muted, marginLeft: "auto" }}>{tab === "accounts" ? `${filteredAccounts.length}개` : `${filteredServices.length}개`} 표시</span>
         </div>
-        <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-          <ButtonFilter label="그룹" options={groupOptions} selected={filterGroups} onChange={setFilterGroups} color="#a78bfa" />
-          <ButtonFilter label="유형" options={allTypes} selected={filterTypes} onChange={setFilterTypes} color={C.blue} />
-          <ButtonFilter label="태그" options={allTags} selected={filterTags} onChange={setFilterTags} color={C.green} />
-        </div>
+        <ButtonFilter label="그룹" options={groupOptions} selected={filterGroups} onChange={setFilterGroups} color="#a78bfa" />
+        <ButtonFilter label="유형" options={filteredTypeOptions} selected={filterTypes} onChange={setFilterTypes} color={C.blue} />
+        <ButtonFilter label="태그" options={filteredTagOptions} selected={filterTags} onChange={setFilterTags} color={C.green} />
       </div>
 
       {/* Body */}

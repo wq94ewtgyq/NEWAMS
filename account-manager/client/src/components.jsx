@@ -128,13 +128,24 @@ export function FilterSel({ label, value, options, onChange }) {
   );
 }
 export function ButtonFilter({ label, options, selected, onChange, color = C.blue }) {
+  const isAll = selected.length === 0;
   const toggle = (val) => {
     onChange(selected.includes(val) ? selected.filter(v => v !== val) : [...selected, val]);
   };
   if (options.length === 0) return null;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-      <span style={{ fontSize: 11, color: C.muted, fontWeight: 700, marginRight: 2 }}>{label}</span>
+      <span style={{ fontSize: 11, color: C.muted, fontWeight: 700, marginRight: 2, minWidth: 30 }}>{label}</span>
+      <button onClick={() => onChange([])}
+        style={{
+          background: isAll ? color + "25" : "transparent",
+          color: isAll ? color : C.muted,
+          border: `1px solid ${isAll ? color + "60" : C.border2}`,
+          borderRadius: 5, padding: "3px 9px", fontSize: 11, fontWeight: 600,
+          cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.15s",
+        }}>
+        전체
+      </button>
       {options.map(o => {
         const active = selected.includes(o);
         return (
@@ -150,12 +161,6 @@ export function ButtonFilter({ label, options, selected, onChange, color = C.blu
           </button>
         );
       })}
-      {selected.length > 0 && (
-        <button onClick={() => onChange([])}
-          style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 10, padding: "3px 4px", textDecoration: "underline" }}>
-          해제
-        </button>
-      )}
     </div>
   );
 }
