@@ -81,7 +81,6 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
       <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontSize: 13, tableLayout: "fixed" }}>
         <colgroup>
           <col style={{ width: 40 }} />
-          <col style={{ width: 100 }} />
           <col style={{ width: "auto" }} />
           <col style={{ width: 180 }} />
           <col style={{ width: 180 }} />
@@ -93,7 +92,6 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
         <thead>
           <tr>
             <th style={thSt}></th>
-            <SortTh k="group">그룹</SortTh>
             <SortTh k="siteName">사이트명</SortTh>
             <th style={thSt}>아이디</th>
             <th style={thSt}>패스워드</th>
@@ -126,14 +124,14 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                       {isInactive && <Tag text="비활성" color={C.sub} />}
                     </div>
                   </td>
-                  <td style={tdSt}>{a.group ? <span style={{ color: grpColor, fontWeight: 700, fontSize: 12 }}>{a.group}</span> : <span style={{ color: C.sub }}>—</span>}</td>
                   <td style={{ ...tdSt, overflow: "hidden" }}>
-                    <div>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
                       <span style={{ fontWeight: 800, color: "#ffffff", fontSize: 14, letterSpacing: -0.2 }}>{a.siteName || "—"}</span>
-                      <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: hasMeta ? 3 : 0, height: hasMeta ? "auto" : 0, overflow: "hidden", opacity: isHov ? 1 : 0, visibility: isHov ? "visible" : "hidden", transition: "opacity 0.15s" }}>
-                        {(a.types || []).map(t => <span key={"t_"+t} style={{ color: C.muted, fontSize: 10, background: C.border + "50", borderRadius: 3, padding: "1px 5px" }}>{t}</span>)}
-                        {(a.tags || []).map(t => <span key={"g_"+t} style={{ color: C.sub, fontSize: 10, background: C.border + "30", borderRadius: 3, padding: "1px 5px" }}>{t}</span>)}
-                      </div>
+                      {a.group && <span style={{ color: grpColor, fontSize: 10, fontWeight: 600, opacity: 0.7, whiteSpace: "nowrap" }}>{a.group}</span>}
+                    </div>
+                    <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: hasMeta ? 3 : 0, height: hasMeta ? "auto" : 0, overflow: "hidden", opacity: isHov ? 1 : 0, visibility: isHov ? "visible" : "hidden", transition: "opacity 0.15s" }}>
+                      {(a.types || []).map(t => <span key={"t_"+t} style={{ color: C.muted, fontSize: 10, background: C.border + "50", borderRadius: 3, padding: "1px 5px" }}>{t}</span>)}
+                      {(a.tags || []).map(t => <span key={"g_"+t} style={{ color: C.sub, fontSize: 10, background: C.border + "30", borderRadius: 3, padding: "1px 5px" }}>{t}</span>)}
                     </div>
                   </td>
                   <td style={tdSt}>
@@ -177,7 +175,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                 </tr>
                 {isOpen && (
                   <tr key={a.id + "_detail"} style={{ background: C.rowEven }}>
-                    <td colSpan={9} style={{ padding: 0, borderLeft: `3px solid ${grpColor}40` }}>
+                    <td colSpan={8} style={{ padding: 0, borderLeft: `3px solid ${grpColor}40` }}>
                       <div style={{ padding: "16px 20px", borderBottom: `1px solid ${C.border}` }}>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))", gap: "12px 20px", marginBottom: 14 }}>
                           {[
@@ -227,7 +225,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
             );
           })}
           {accounts.length === 0 && (
-            <tr><td colSpan={9} style={{ textAlign: "center", padding: 60, color: C.sub }}>계정이 없습니다.</td></tr>
+            <tr><td colSpan={8} style={{ textAlign: "center", padding: 60, color: C.sub }}>계정이 없습니다.</td></tr>
           )}
         </tbody>
       </table>
