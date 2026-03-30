@@ -19,12 +19,14 @@ export function CopyBtn({ text, label }) {
       onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(text); set(true); setTimeout(() => set(false), 1500); }}
       title={`${label || "복사"}`}
       style={{ background: ok ? C.accent + "22" : "transparent", border: `1px solid ${ok ? C.accent + "44" : C.border2}`, cursor: "pointer", color: ok ? C.accent : C.muted, padding: "3px 8px", fontSize: 11, borderRadius: 5, fontWeight: 600, whiteSpace: "nowrap", transition: "all 0.15s" }}>
-      {ok ? "✓ 복사됨" : `⧉ ${label || "복사"}`}
+      {ok ? "✓ 복사됨" : `${label || "복사"}`}
     </button>
   );
 }
 export function PwCell({ value }) {
   const [show, set] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const copy = e => { e.stopPropagation(); navigator.clipboard.writeText(value); setCopied(true); setTimeout(() => setCopied(false), 1500); };
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
       <span style={{ fontFamily: "monospace", fontSize: 12, color: show ? C.text : C.sub, letterSpacing: show ? 0.5 : 2, minWidth: 70 }}>
@@ -35,10 +37,10 @@ export function PwCell({ value }) {
         title={show ? "숨기기" : "보기"}>
         {show ? "숨김" : "보기"}
       </button>
-      <button onClick={e => { e.stopPropagation(); navigator.clipboard.writeText(value); }}
-        style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 4, cursor: "pointer", color: C.sub, fontSize: 12, padding: "2px 6px", lineHeight: 1 }}
+      <button onClick={copy}
+        style={{ background: copied ? C.accent + "22" : "none", border: `1px solid ${copied ? C.accent + "44" : C.border}`, borderRadius: 4, cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 12, padding: "2px 6px", lineHeight: 1, transition: "all 0.15s" }}
         title="복사">
-        복사
+        {copied ? "✓ 복사됨" : "복사"}
       </button>
     </div>
   );

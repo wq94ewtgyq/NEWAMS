@@ -139,7 +139,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   <td style={tdSt}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, opacity: 0.7 }}>
                       <span style={{ fontFamily: "monospace", color: C.muted, fontSize: 12 }}>{a.username || "—"}</span>
-                      {a.username && <CopyBtn text={a.username} label="ID" />}
+                      {a.username && <CopyBtn text={a.username} label="복사" />}
                     </div>
                   </td>
                   <td style={tdSt} onClick={e => e.stopPropagation()}>
