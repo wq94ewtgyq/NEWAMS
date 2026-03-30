@@ -390,14 +390,14 @@ export default function App() {
     <div style={{ minHeight: "100vh", background: C.bg, fontFamily: "'Pretendard','Noto Sans KR',sans-serif", color: C.text }}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}`}</style>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      {saving && <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: 3, zIndex: 9998, background: `linear-gradient(90deg,${C.accent},#ff4d4d)` }} />}
+      {saving && <div style={{ position: "fixed", top: 0, left: 0, right: 0, height: 3, zIndex: 9998, background: `linear-gradient(90deg,${C.accent},${C.blue})` }} />}
 
       {/* Header */}
       <div style={{ background: C.surface, borderBottom: `1px solid ${C.border}`, padding: "16px 28px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
           <Logo />
           <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", letterSpacing: -0.5 }}>ROUTE BY <span style={{ color: C.accent }}>계정 관리</span></div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", letterSpacing: -0.5 }}>ROUTE BY <span style={{ color: C.brand }}>계정 관리</span></div>
             <div style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>
               계정 {activeAccounts.length}개 · 서비스 {services.filter(s => s.status === "active").length}개 이용중
               {alertCount > 0 && <span style={{ color: C.warn, marginLeft: 8 }}>⚠ 만료 임박 {alertCount}건</span>}
@@ -444,7 +444,7 @@ export default function App() {
           <span style={{ fontSize: 11, color: C.muted, marginLeft: "auto" }}>{tab === "accounts" ? `${filteredAccounts.length}개` : `${filteredServices.length}개`} 표시</span>
         </div>
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-          <ButtonFilter label="그룹" options={groupOptions} selected={filterGroups} onChange={setFilterGroups} color={C.accent} />
+          <ButtonFilter label="그룹" options={groupOptions} selected={filterGroups} onChange={setFilterGroups} color="#a78bfa" />
           <ButtonFilter label="플랫폼" options={allPlatforms} selected={filterPlatforms} onChange={setFilterPlatforms} color="#e07c24" />
           <ButtonFilter label="유형" options={allTypes} selected={filterTypes} onChange={setFilterTypes} color={C.blue} />
           <ButtonFilter label="태그" options={allTags} selected={filterTags} onChange={setFilterTags} color={C.green} />
@@ -559,7 +559,7 @@ export default function App() {
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <span style={{ fontWeight: 700, color: "#fff", fontSize: 13 }}>{a.owner || "—"}</span>
                   {a.group && <span style={{ background: C.muted + "20", color: C.muted, borderRadius: 4, padding: "1px 6px", fontSize: 11 }}>{a.group}</span>}
-                  <span style={{ color: C.accent, fontFamily: "monospace", fontSize: 12 }}>{a.username || "—"}</span>
+                  <span style={{ color: C.blue, fontFamily: "monospace", fontSize: 12 }}>{a.username || "—"}</span>
                   <span style={{ color: C.muted, fontSize: 11 }}>{a.siteName || a.url || ""}</span>
                 </div>
               </div>

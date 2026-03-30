@@ -46,7 +46,7 @@ export function Btn({ children, onClick, small, accent, blue, danger, ghost, war
   else if (green)  { bg = C.green + "22";  color = C.green;  border = `1px solid ${C.green}44`; }
   else if (warn)   { bg = C.warn + "22";   color = C.warn;   border = `1px solid ${C.warn}44`; }
   else if (ghost)  { bg = "transparent";   color = C.muted;  border = `1px solid ${C.border2}`; }
-  else             { bg = `linear-gradient(135deg,${C.accent},#ff4d4d)`; color = "#fff"; border = "none"; }
+  else             { bg = `linear-gradient(135deg,${C.accent},${C.blue})`; color = "#fff"; border = "none"; }
   return (
     <button onClick={onClick} disabled={disabled} style={{
       background: bg, color, border, borderRadius: small ? 6 : 9,
@@ -491,7 +491,7 @@ export function AccountForm({ form, setForm, owners, groups, platformOptions, ty
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px 16px", marginTop: 10 }}>
           <FieldRow label="플랫폼">
-            <MultiTagInput selected={form.platforms || []} onChange={f("platforms")} options={platformOptions} onManage={onManagePlatforms} placeholder="플랫폼 검색..." color={C.accent} />
+            <MultiTagInput selected={form.platforms || []} onChange={f("platforms")} options={platformOptions} onManage={onManagePlatforms} placeholder="플랫폼 검색..." color="#e07c24" />
           </FieldRow>
           <FieldRow label="유형">
             <MultiTagInput selected={form.types || []} onChange={f("types")} options={typeOptions} onManage={onManageTypes} placeholder="유형 검색..." color={C.blue} />

@@ -61,8 +61,8 @@ export function fmtCost(v) {
 export const C = {
   bg: "#090c17", surface: "#0f1220", border: "#1c2238", border2: "#242b42",
   text: "#dde2f0", muted: "#5a647a",
-  accent: "#E81E1E", blue: "#4d8cff", warn: "#f59e0b", danger: "#ff5f5f",
-  ended: "#3a4050", green: "#00d4aa",
+  accent: "#00d4aa", blue: "#4d8cff", warn: "#f59e0b", danger: "#ff5f5f",
+  ended: "#3a4050", green: "#00d4aa", brand: "#E81E1E",
 };
 export const inputSt = {
   background: "#070a14", border: `1px solid ${C.border2}`,
@@ -71,7 +71,7 @@ export const inputSt = {
   width: "100%", boxSizing: "border-box",
 };
 export const tdSt = { padding: "11px 13px", verticalAlign: "middle", whiteSpace: "nowrap" };
-export const groupColors = { "메인": "#E81E1E", "업무유틸": "#4d8cff", "데일리": "#f59e0b" };
+export const groupColors = { "메인": "#a78bfa", "업무유틸": "#4d8cff", "데일리": "#f59e0b" };
 
 // ─────────────────────────────────────────────────────
 // 인증방법 옵션

@@ -78,7 +78,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   </td>
                   <td style={tdSt}><span style={{ fontWeight: 700, color: "#fff" }}>{a.owner || "—"}</span></td>
                   <td style={tdSt}>{a.group ? <Tag text={a.group} color={groupColors[a.group] || C.muted} /> : "—"}</td>
-                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.platforms || []).length > 0 ? (a.platforms || []).map(t => <Tag key={t} text={t} color={C.accent} />) : "—"}</div></td>
+                  <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.platforms || []).length > 0 ? (a.platforms || []).map(t => <Tag key={t} text={t} color="#e07c24" />) : "—"}</div></td>
                   <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.types || []).length > 0 ? (a.types || []).map(t => <Tag key={t} text={t} color={C.blue} />) : "—"}</div></td>
                   <td style={tdSt}><div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>{(a.tags || []).length > 0 ? (a.tags || []).map(t => <Tag key={t} text={t} color={C.green} />) : "—"}</div></td>
                   <td style={tdSt}>
@@ -86,7 +86,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   </td>
                   <td style={tdSt}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontFamily: "monospace", color: C.accent, fontSize: 13 }}>{a.username || "—"}</span>
+                      <span style={{ fontFamily: "monospace", color: C.blue, fontSize: 13 }}>{a.username || "—"}</span>
                       {a.username && <CopyBtn text={a.username} label="ID" />}
                     </div>
                   </td>
@@ -96,7 +96,7 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
                   <td style={tdSt} onClick={e => e.stopPropagation()}>
                     {a.url ? (
                       <a href={a.url.startsWith("http") ? a.url : `https://${a.url}`} target="_blank" rel="noreferrer"
-                        style={{ background: `linear-gradient(135deg,${C.accent},#ff4d4d)`, color: "#fff", borderRadius: 6, padding: "4px 12px", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
+                        style={{ background: `linear-gradient(135deg,${C.brand},#ff4d4d)`, color: "#fff", borderRadius: 6, padding: "4px 12px", fontSize: 11, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}>
                         접속하기
                       </a>
                     ) : <span style={{ color: C.muted }}>—</span>}
@@ -226,7 +226,7 @@ export function ServicesTab({ services, accounts, onEdit, onRenew, onEnd, onReac
                   <td style={tdSt}>{isEnded ? <Tag text="이용종료" color={C.muted} /> : <Tag text="이용중" color={C.green} />}</td>
                   <td style={tdSt}><span style={{ fontWeight: 700, color: "#fff" }}>{acc.owner || "—"}</span></td>
                   <td style={tdSt}>{acc.group ? <Tag text={acc.group} color={groupColors[acc.group] || C.muted} /> : "—"}</td>
-                  <td style={tdSt}><span style={{ fontFamily: "monospace", color: C.accent, fontSize: 12 }}>{acc.username || "—"}</span></td>
+                  <td style={tdSt}><span style={{ fontFamily: "monospace", color: C.blue, fontSize: 12 }}>{acc.username || "—"}</span></td>
                   <td style={tdSt}><span style={{ fontWeight: 700, textDecoration: isEnded ? "line-through" : "none", color: isEnded ? C.muted : C.text }}>{s.name}</span></td>
                   <td style={tdSt}><span style={{ color: C.muted }}>{s.startDate || "—"}</span></td>
                   <td style={tdSt}><Tag text={s.period} color={isEnded ? C.muted : C.blue} /></td>
