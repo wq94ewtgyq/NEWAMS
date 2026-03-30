@@ -28,9 +28,9 @@ export function IdCopyBtn({ text }) {
   const copy = e => { e.stopPropagation(); navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); };
   return (
     <button onClick={copy}
-      style={{ background: copied ? C.accent + "22" : "none", border: `1px solid ${copied ? C.accent + "44" : C.border}`, borderRadius: 4, cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 12, padding: "2px 6px", lineHeight: 1, transition: "all 0.15s" }}
-      title="복사">
-      {copied ? "✓ 복사됨" : "복사"}
+      style={{ background: "none", border: "none", cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 14, padding: "0 2px", lineHeight: 1, transition: "color 0.15s" }}
+      title={copied ? "복사됨" : "복사"}>
+      {copied ? "✓" : "⧉"}
     </button>
   );
 }
@@ -39,19 +39,19 @@ export function PwCell({ value }) {
   const [copied, setCopied] = useState(false);
   const copy = e => { e.stopPropagation(); navigator.clipboard.writeText(value); setCopied(true); setTimeout(() => setCopied(false), 1500); };
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-      <span style={{ fontFamily: "monospace", fontSize: 12, color: show ? C.text : C.sub, letterSpacing: show ? 0.5 : 2, minWidth: 70 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+      <span style={{ fontFamily: "monospace", fontSize: 12, color: show ? C.text : C.sub, letterSpacing: show ? 0.5 : 2 }}>
         {show ? value : "••••••"}
       </span>
+      <button onClick={copy}
+        style={{ background: "none", border: "none", cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 14, padding: "0 2px", lineHeight: 1, transition: "color 0.15s" }}
+        title={copied ? "복사됨" : "복사"}>
+        {copied ? "✓" : "⧉"}
+      </button>
       <button onClick={e => { e.stopPropagation(); set(s => !s); }}
-        style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 4, cursor: "pointer", color: show ? C.accent : C.sub, fontSize: 12, padding: "2px 6px", lineHeight: 1 }}
+        style={{ background: "none", border: "none", cursor: "pointer", color: show ? C.accent : C.sub, fontSize: 12, padding: "0 2px", lineHeight: 1 }}
         title={show ? "숨기기" : "보기"}>
         {show ? "숨김" : "보기"}
-      </button>
-      <button onClick={copy}
-        style={{ background: copied ? C.accent + "22" : "none", border: `1px solid ${copied ? C.accent + "44" : C.border}`, borderRadius: 4, cursor: "pointer", color: copied ? C.accent : C.sub, fontSize: 12, padding: "2px 6px", lineHeight: 1, transition: "all 0.15s" }}
-        title="복사">
-        {copied ? "✓ 복사됨" : "복사"}
       </button>
     </div>
   );
