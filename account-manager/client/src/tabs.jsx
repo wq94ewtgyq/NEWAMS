@@ -81,14 +81,14 @@ export function AccountsTab({ accounts, services, svcByAcc, onEdit, onDelete, on
       <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontSize: 13, tableLayout: "fixed" }}>
         <colgroup>
           <col style={{ width: 40 }} />
-          <col style={{ width: 100 }} />
-          <col style={{ width: "auto" }} />
+          <col style={{ width: 90 }} />
+          <col style={{ width: 220 }} />
+          <col style={{ width: 260 }} />
           <col style={{ width: 180 }} />
-          <col style={{ width: 180 }} />
-          <col style={{ width: 60 }} />
+          <col style={{ width: 88 }} />
+          <col style={{ width: 110 }} />
           <col style={{ width: 80 }} />
-          <col style={{ width: 60 }} />
-          <col style={{ width: 130 }} />
+          <col style={{ width: 120 }} />
         </colgroup>
         <thead>
           <tr>
