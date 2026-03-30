@@ -399,7 +399,7 @@ export default function App() {
           <div>
             <div style={{ fontSize: 18, fontWeight: 800, color: "#fff", letterSpacing: -0.5 }}>ROUTE BY <span style={{ color: C.brand }}>계정 관리</span></div>
             <div style={{ fontSize: 11, color: C.muted, marginTop: 1 }}>
-              계정 {activeAccounts.length}개 · 서비스 {services.filter(s => s.status === "active").length}개 이용중
+              계정 {visibleAccounts.length}개 · 서비스 {services.filter(s => s.status === "active").length}개 이용중
               {alertCount > 0 && <span style={{ color: C.warn, marginLeft: 8 }}>⚠ 만료 임박 {alertCount}건</span>}
               {endedCount > 0 && <span style={{ color: C.ended, marginLeft: 8 }}>· 종료 {endedCount}건</span>}
               {saving && <span style={{ color: C.accent, marginLeft: 8 }}>저장 중...</span>}
