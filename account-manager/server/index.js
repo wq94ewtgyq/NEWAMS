@@ -14,7 +14,7 @@ const DB_PATH = path.join(__dirname, '../data/db.json');
 function ensureDb() {
   if (!fs.existsSync(DB_PATH)) {
     fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-    fs.writeFileSync(DB_PATH, JSON.stringify({ accounts: [], services: [] }, null, 2));
+    fs.writeFileSync(DB_PATH, JSON.stringify({ accounts: [], services: [], owners: [], groups: [], categories: [] }, null, 2));
   }
 }
 
@@ -34,7 +34,7 @@ async function writeDb(data) {
 
 // 미들웨어
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // API: 데이터 읽기
 app.get('/api/data', (req, res) => {
@@ -45,9 +45,9 @@ app.get('/api/data', (req, res) => {
 
 // API: 데이터 저장
 app.post('/api/data', async (req, res) => {
-  const { accounts, services } = req.body;
+  const { accounts, services, owners, groups, categories } = req.body;
   try {
-    await writeDb({ accounts, services });
+    await writeDb({ accounts, services, owners: owners || [], groups: groups || [], categories: categories || [] });
     res.json({ ok: true });
   } catch (err) {
     if (err.code === 'ELOCKED') {

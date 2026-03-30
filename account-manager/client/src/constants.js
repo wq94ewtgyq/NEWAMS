@@ -6,14 +6,21 @@ export const API = "/api";
 export async function loadData() {
   const res = await fetch(`${API}/data`);
   if (!res.ok) throw new Error("데이터 로드 실패");
-  return res.json();
+  const data = await res.json();
+  return {
+    accounts: data.accounts || [],
+    services: data.services || [],
+    owners: data.owners || [],
+    groups: data.groups || [],
+    categories: data.categories || [],
+  };
 }
 
-export async function saveData(accounts, services) {
+export async function saveAllData({ accounts, services, owners, groups, categories }) {
   const res = await fetch(`${API}/data`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ accounts, services }),
+    body: JSON.stringify({ accounts, services, owners, groups, categories }),
   });
   if (res.status === 503) throw new Error("다른 사용자가 저장 중입니다. 잠시 후 다시 시도하세요.");
   if (!res.ok) throw new Error("저장 실패");
@@ -47,13 +54,13 @@ export function fmtCost(v) {
 }
 
 // ─────────────────────────────────────────────────────
-// 색상 / 스타일
+// 색상 / 스타일 — 브랜드 컬러 #e81e81
 // ─────────────────────────────────────────────────────
 export const C = {
   bg: "#090c17", surface: "#0f1220", border: "#1c2238", border2: "#242b42",
   text: "#dde2f0", muted: "#5a647a",
-  accent: "#00d4aa", blue: "#4d8cff", warn: "#f59e0b", danger: "#ff5f5f",
-  ended: "#3a4050",
+  accent: "#e81e81", blue: "#4d8cff", warn: "#f59e0b", danger: "#ff5f5f",
+  ended: "#3a4050", green: "#00d4aa",
 };
 export const inputSt = {
   background: "#070a14", border: `1px solid ${C.border2}`,
@@ -62,15 +69,22 @@ export const inputSt = {
   width: "100%", boxSizing: "border-box",
 };
 export const tdSt = { padding: "11px 13px", verticalAlign: "middle", whiteSpace: "nowrap" };
-export const groupColors = { "메인": "#00d4aa", "업무유틸": "#4d8cff", "데일리": "#f59e0b" };
+export const groupColors = { "메인": "#e81e81", "업무유틸": "#4d8cff", "데일리": "#f59e0b" };
+
+// ─────────────────────────────────────────────────────
+// 인증방법 옵션
+// ─────────────────────────────────────────────────────
+export const AUTH_METHODS = ["없음", "휴대폰문자", "휴대폰OTP", "이메일OTP", "보안카드"];
 
 // ─────────────────────────────────────────────────────
 // 폼 초기값
 // ─────────────────────────────────────────────────────
 export const emptyAccount = {
-  owner: "", group: "", cat2: "", cat3: "", accessType: "사이트",
-  url: "", loginMethod: "일반", linkedAccount: "-",
-  username: "", password: "", authMethod: "없음", authContact: "", note: "",
+  owner: "", group: "", category: "", subcategory: "", accessType: "사이트",
+  siteName: "", url: "", loginMethod: "일반", linkedAccount: "",
+  username: "", password: "",
+  authInfos: [{ method: "없음", contact: "" }],
+  note: "",
 };
 export const emptyService = {
   accountId: "", name: "", startDate: "", period: "12개월",
